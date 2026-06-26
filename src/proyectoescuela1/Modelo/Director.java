@@ -4,16 +4,15 @@
  */
 package proyectoescuela1.Modelo;
 
-/**
- *
- * @author ALEX
- */
-public class Director extends Usuario {
+import java.util.Date;
 
-    public Director(int id, String nombre, String apellido, String dni, String correo, String telefono) {
-        super(id, nombre, apellido, dni, correo, telefono);
+
+public class Director extends Usuario{
+
+    public Director(int id, String nombre, String apellidos, String dni, String email, String telefono, String direccion, Date fechaNac) {
+        super(id, nombre, apellidos, dni, email, telefono, direccion, fechaNac);
     }
-    
+
     public void gestionarSistema(){
     System.out.println("sistema gestionado...");
     }
@@ -25,6 +24,11 @@ public class Director extends Usuario {
     
     public void aprobarMatricula(){
     System.out.println("Matricula aprobada");
+    }
+
+    @Override
+    public String toString() {
+        return "Director{id=" + id + ", nombre='" + getNombreCompleto() + "'}";
     }
     
     

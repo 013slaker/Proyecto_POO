@@ -1,12 +1,23 @@
 package proyectoescuela1.Modelo;
 
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class Secretaria extends Usuario{
 
-    public Secretaria(int id, String nombre, String apellido, String dni, String correo, String telefono) {
-        super(id, nombre, apellido, dni, correo, telefono);
+    public Secretaria(int id, String nombre, String apellidos, String dni, String email, String telefono, String direccion, Date fechaNac) {
+        super(id, nombre, apellidos, dni, email, telefono, direccion, fechaNac);
     }
+
+    @Override
+    public String toString() {
+        return "Secretaria{" + '}';
+    }
+
+    
+    
+
+   
     
     
 
