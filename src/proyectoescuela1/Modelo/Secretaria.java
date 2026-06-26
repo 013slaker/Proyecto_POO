@@ -2,7 +2,13 @@ package proyectoescuela1.Modelo;
 
 import javax.swing.JOptionPane;
 
-public class Secretaria {
+public class Secretaria extends Usuario{
+
+    public Secretaria(int id, String nombre, String apellido, String dni, String correo, String telefono) {
+        super(id, nombre, apellido, dni, correo, telefono);
+    }
+    
+    
 
     public void registrarMatricula(String alumno, String grado, String seccion) {
 
