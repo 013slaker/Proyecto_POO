@@ -21,10 +21,8 @@ public class MenuPrincipalVista extends JFrame {
 
     // BOTONES MÓDULOS
     private JButton btnAcademico;
-    private JButton btnAlumnos;
-    private JButton btnDocentes;
-    private JButton btnMatricula;
-    private JButton btnPagos;
+    private JButton btnAdministrativo;
+    private JButton btnFinanciero;
     private JButton btnReportes;
     private JButton btnSalir;
 
@@ -136,14 +134,11 @@ public class MenuPrincipalVista extends JFrame {
             mostrarPanel(crearSubMenuAcademico());
         });
 
-        btnDocentes = new JButton("Docentes");
-        asignarImagenBoton(btnDocentes, "/proyectoescuela1/iconos/docente.png", 40, 40);
+        btnAdministrativo = new JButton("Administrativo");
+        asignarImagenBoton(btnAdministrativo, "/proyectoescuela1/iconos/administrativo.png", 40, 40);
 
-        btnMatricula = new JButton("Matrícula");
-        asignarImagenBoton(btnMatricula, "/proyectoescuela1/iconos/matricula.png", 40, 40);
-
-        btnPagos = new JButton("Pagos");
-        asignarImagenBoton(btnPagos, "/proyectoescuela1/iconos/pagos.png", 40, 40);
+        btnFinanciero = new JButton("Financiero");
+        asignarImagenBoton(btnFinanciero, "/proyectoescuela1/iconos/financiero.png", 40, 40);
 
         btnReportes = new JButton("Reportes");
         asignarImagenBoton(btnReportes, "/proyectoescuela1/iconos/reportes.png", 40, 40);
@@ -152,10 +147,10 @@ public class MenuPrincipalVista extends JFrame {
         asignarImagenBoton(btnSalir, "/proyectoescuela1/iconos/salir.png", 40, 40);
 
         panelMenu.add(btnAcademico);
-        panelMenu.add(btnDocentes);
-        panelMenu.add(btnMatricula);
-        panelMenu.add(btnPagos);
+        panelMenu.add(btnAdministrativo);
+        panelMenu.add(btnFinanciero);
         panelMenu.add(btnReportes);
+        panelMenu.add(btnSalir);
 
         panelMenu.add(
                 new JLabel("")
