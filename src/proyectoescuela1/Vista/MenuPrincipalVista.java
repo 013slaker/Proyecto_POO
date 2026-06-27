@@ -6,6 +6,8 @@ package proyectoescuela1.Vista;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import proyectoescuela1.Modelo.Cuenta;
 
 /**
  *
@@ -18,6 +20,7 @@ public class MenuPrincipalVista extends JFrame {
     private JPanel panelContenido;
     private JPanel panelSuperior;
     private JPanel panelInferior;
+ 
 
     // BOTONES MÓDULOS
     private JButton btnAcademico;
@@ -25,16 +28,15 @@ public class MenuPrincipalVista extends JFrame {
     private JButton btnFinanciero;
     private JButton btnReportes;
     private JButton btnSalir;
-
-    public MenuPrincipalVista() {
+   private Cuenta cuenta;
+   
+    public MenuPrincipalVista(Cuenta cuenta) {
+        this.cuenta = cuenta;
 
         setTitle("Sistema de Gestión Escolar");
         setSize(1200, 700);
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         setLocationRelativeTo(null);
-
         initComponentes();
 
     }
@@ -204,15 +206,15 @@ public class MenuPrincipalVista extends JFrame {
 
     public static void main(String[] args) {
 
-        SwingUtilities.invokeLater(
-                () -> {
-                    MenuPrincipalVista menu
-                    = new MenuPrincipalVista();
-                    menu.setVisible(true);
-                }
-        );
-    }
+    SwingUtilities.invokeLater(() -> {
 
+        List<Cuenta> cuentas = new ArrayList<>();
+        cuentas.add(new Cuenta(1, "director1", "admin123", "DIRECTOR"));
+        cuentas.add(new Cuenta(2, "secretaria1", "admin123", "SECRETARIA"));
+
+        new LoginVista(cuentas).setVisible(true);
+    });
+}
     //metodos para llamar los paneles con los botones
     private void mostrarPanel(JPanel panel) {
         panelContenido.removeAll();
