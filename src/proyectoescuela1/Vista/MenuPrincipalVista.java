@@ -6,7 +6,13 @@ package proyectoescuela1.Vista;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.SwingUtilities;
 import proyectoescuela1.Modelo.Cuenta;
 
 /**
@@ -20,7 +26,6 @@ public class MenuPrincipalVista extends JFrame {
     private JPanel panelContenido;
     private JPanel panelSuperior;
     private JPanel panelInferior;
- 
 
     // BOTONES MÓDULOS
     private JButton btnAcademico;
@@ -28,11 +33,11 @@ public class MenuPrincipalVista extends JFrame {
     private JButton btnFinanciero;
     private JButton btnReportes;
     private JButton btnSalir;
-   private Cuenta cuenta;
-   
+    private Cuenta cuenta;
+
     public MenuPrincipalVista(Cuenta cuenta) {
         this.cuenta = cuenta;
-
+        Date fecha = new Date();
         setTitle("Sistema de Gestión Escolar");
         setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,37 +77,31 @@ public class MenuPrincipalVista extends JFrame {
         );
 
         JLabel titulo
-                = new JLabel(
-                        "SISTEMA DE GESTIÓN ESCOLAR"
-                );
+                = new JLabel("SISTEMA DE GESTIÓN ESCOLAR");
 
-        titulo.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        24
-                )
-        );
+        titulo.setFont(new Font(
+                "Arial", Font.BOLD, 24));
 
         JLabel usuario
                 = new JLabel(
-                        "Usuario: Secretaria"
+                        "Usuario: " + cuenta.getUsuario()
+                        + " | Rol: " + cuenta.getRol()
                 );
+        //para formato de fecha
+        Date fecha = new Date();
 
-        panelSuperior.add(
-                titulo,
-                BorderLayout.WEST
-        );
+SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-        panelSuperior.add(
-                usuario,
-                BorderLayout.EAST
-        );
+String fechaFormateada = formato.format(fecha);
 
-        add(
-                panelSuperior,
-                BorderLayout.NORTH
-        );
+JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
+
+        panelSuperior.add(titulo, BorderLayout.WEST);
+
+        panelSuperior.add(usuario, BorderLayout.EAST);
+        panelSuperior.add(fechaIngreso, BorderLayout.SOUTH);
+
+        add(panelSuperior, BorderLayout.NORTH);
 
     }
 //IMAGEN PARA BOTONES
@@ -206,15 +205,16 @@ public class MenuPrincipalVista extends JFrame {
 
     public static void main(String[] args) {
 
-    SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
 
-        List<Cuenta> cuentas = new ArrayList<>();
-        cuentas.add(new Cuenta(1, "director1", "admin123", "DIRECTOR"));
-        cuentas.add(new Cuenta(2, "secretaria1", "admin123", "SECRETARIA"));
+            List<Cuenta> cuentas = new ArrayList<>();
+            cuentas.add(new Cuenta(1, "director1", "admin123", "DIRECTOR"));
+            cuentas.add(new Cuenta(2, "secretaria1", "admin123", "SECRETARIA"));
 
-        new LoginVista(cuentas).setVisible(true);
-    });
-}
+            new LoginVista(cuentas).setVisible(true);
+        });
+    }
+
     //metodos para llamar los paneles con los botones
     private void mostrarPanel(JPanel panel) {
         panelContenido.removeAll();
@@ -232,6 +232,13 @@ public class MenuPrincipalVista extends JFrame {
         JButton btnAlumnos = new JButton("Gestión Alumnos");
         asignarImagenBoton(btnAlumnos, "/proyectoescuela1/iconos/alumno.png", 40, 40);
         btnAlumnos.addActionListener(e -> {
+            System.out.println("CLICK ALUMNOS");
+            mostrarPanel(new AlumnoVista());
+        });
+        
+        JButton btnApoderado = new JButton("Gestión Apoderado");
+        asignarImagenBoton(btnApoderado, "/proyectoescuela1/iconos/apoderado.png", 40, 40);
+        btnApoderado.addActionListener(e -> {
             System.out.println("CLICK ALUMNOS");
             mostrarPanel(new AlumnoVista());
         });
@@ -257,6 +264,7 @@ public class MenuPrincipalVista extends JFrame {
         JButton btnLibretas = new JButton("Libretas de Notas");
 
         panel.add(btnAlumnos);
+        panel.add(btnApoderado);
         panel.add(btnDocentes);
         panel.add(btnCursos);
         panel.add(btnHorarios);
@@ -267,6 +275,9 @@ public class MenuPrincipalVista extends JFrame {
         // EVENTOS
         btnAlumnos.addActionListener(e -> {
             mostrarPanel(new AlumnoVista());
+        });
+        btnApoderado.addActionListener(e -> {
+            mostrarPanel(new ApoderadoVista());
         });
 
         btnDocentes.addActionListener(e -> {
