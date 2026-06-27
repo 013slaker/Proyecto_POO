@@ -1,83 +1,92 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package proyectoescuela1.Vista;
+
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 import proyectoescuela1.Controlador.LoginControlador;
 import proyectoescuela1.Modelo.Cuenta;
-import proyectoescuela1.Controlador.*;
+import proyectoescuela1.Vista.MenuPrincipalVista;
 
-/**
- *
- * @author ALEX
- */
-public class LoginVista extends JFrame{
+public class LoginVista extends JFrame {
+
+    // CONTROLADOR DEL LOGIN
     private LoginControlador controlador;
-     
+
+    // CAMPOS DE TEXTO
     private JTextField txtUsuario = new JTextField(20);
     private JPasswordField txtContrasena = new JPasswordField(20);
+
+    // BOTÓN
     private JButton btnIngresar = new JButton("Ingresar");
-    
-    
-    
-    
+
+    // CONSTRUCTOR
+    public LoginVista(List<Cuenta> cuentas) {
+
+        // inicializa controlador con lista de cuentas
+        this.controlador = new LoginControlador(cuentas);
+
+        // configuración de ventana
+        setTitle("Inicio de Sesión");
+        setSize(350, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // construir UI y eventos
+        initComponentes();
+        initEventos();
+    }
+
+    // -----------------------------
+    // INTERFAZ GRÁFICA
+    // -----------------------------
     private void initComponentes() {
+
         JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
+
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        // etiquetas y campos
         panel.add(new JLabel("Usuario:"));
         panel.add(txtUsuario);
+
         panel.add(new JLabel("Contraseña:"));
         panel.add(txtContrasena);
-        panel.add(new JLabel(""));
+
+        panel.add(new JLabel("")); // espacio vacío
         panel.add(btnIngresar);
 
         add(panel);
     }
-    
-    private void initEventos(){
+
+    // -----------------------------
+    // EVENTOS DEL BOTÓN
+    // -----------------------------
+    private void initEventos() {
+
         btnIngresar.addActionListener(e -> {
-        String usuario = txtUsuario.getText().trim();
-        String clave = new String(txtContrasena.getPassword());
-        String rol = controlador.validarLogin(usuario, clave);
-        
-        if (rol == null) {
+
+            // obtener datos ingresados
+            String usuario = txtUsuario.getText().trim();
+            String clave = new String(txtContrasena.getPassword());
+
+            // validar login (DEVUELVE CUENTA)
+            Cuenta cuenta = controlador.validarLogin(usuario, clave);
+
+            // si es incorrecto
+            if (cuenta == null) {
                 JOptionPane.showMessageDialog(this,
-                    "Usuario o contraseña incorrectos.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                        "Usuario o contraseña incorrectos",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
-        
-        dispose();
-        
-        if (rol.equals("DIRECTOR")) {
-                new DirectorVista().setVisible(true);
-            } //else if (rol.equals("SECRETARIA")){
-            //JOptionPane.showMessageDialog(null, "Bienvenido, Secretaria"); // falta que sebas agregue xd
-            //} else {
-            //    JOptionPane.showMessageDialog(null, "Bienvenido: " + rol);
-           // }
-        
-        
-        });  
-    }
-    
-    public LoginVista(List<Cuenta> cuentas) {
-        this.controlador = new LoginControlador(cuentas);
 
-        setTitle("Inicio de Sesión");
-        setSize(320, 200);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        initComponentes();
-        initEventos();
+            // cerrar login
+            dispose();
+
+            // abrir menú principal pasando la cuenta
+            MenuPrincipalVista menu = new MenuPrincipalVista(cuenta);
+            menu.setVisible(true);
+        });
     }
-    
-    
-    
-    
-    
 }
