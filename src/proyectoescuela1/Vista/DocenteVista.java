@@ -58,7 +58,7 @@ public class DocenteVista extends JPanel {
 
         setLayout(new BorderLayout(10, 10));
 
-        // ================= FORMULARIO =================
+        
         JPanel panelForm = new JPanel(new GridLayout(8, 2, 5, 5));
         panelForm.setBorder(BorderFactory.createTitledBorder("Datos del Docente"));
 
@@ -86,33 +86,33 @@ public class DocenteVista extends JPanel {
         panelForm.add(new JLabel("Nivel:"));
         panelForm.add(comboNivel);
 
-        // ================= BOTONES =================
+        // BOTONES
         JPanel panelBotones = new JPanel(new FlowLayout());
         panelBotones.add(btnGuardar);
         panelBotones.add(btnEliminar);
         panelBotones.add(btnLimpiar);
 
-        // ================= BUSCADOR =================
+        // BUSCADOR 
         JPanel panelBuscar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelBuscar.add(new JLabel("Buscar:"));
         panelBuscar.add(txtBuscar);
         panelBuscar.add(btnBuscar);
 
-        // ================= SUPERIOR =================
+        // panel SUPERIOR 
         JPanel panelSuperior = new JPanel(new BorderLayout());
         panelSuperior.add(panelForm, BorderLayout.CENTER);
         panelSuperior.add(panelBotones, BorderLayout.SOUTH);
 
-        // ================= TABLA =================
+        // area de TABLA 
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder("Lista de Docentes"));
 
-        // ================= INFERIOR =================
+        // panelINFERIOR 
         JPanel panelInferior = new JPanel(new BorderLayout());
         panelInferior.add(panelBuscar, BorderLayout.NORTH);
         panelInferior.add(scroll, BorderLayout.CENTER);
 
-        // ================= ADD =================
+        
         add(panelSuperior, BorderLayout.NORTH);
         add(panelInferior, BorderLayout.CENTER);
     }

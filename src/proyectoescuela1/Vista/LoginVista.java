@@ -6,7 +6,7 @@ package proyectoescuela1.Vista;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import proyectoescuela1.Controlador.loginControlador;
+import proyectoescuela1.Controlador.LoginControlador;
 import proyectoescuela1.Modelo.Cuenta;
 import proyectoescuela1.Controlador.*;
 
@@ -15,7 +15,7 @@ import proyectoescuela1.Controlador.*;
  * @author ALEX
  */
 public class LoginVista extends JFrame{
-    private loginControlador controlador;
+    private LoginControlador controlador;
      
     private JTextField txtUsuario = new JTextField(20);
     private JPasswordField txtContrasena = new JPasswordField(20);
@@ -66,7 +66,7 @@ public class LoginVista extends JFrame{
     }
     
     public LoginVista(List<Cuenta> cuentas) {
-        this.controlador = new loginControlador(cuentas);
+        this.controlador = new LoginControlador(cuentas);
 
         setTitle("Inicio de Sesión");
         setSize(320, 200);
