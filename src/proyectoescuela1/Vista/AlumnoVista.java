@@ -16,9 +16,9 @@ import javax.swing.table.*;
 import proyectoescuela1.Controlador.AlumnoControlador;
 import proyectoescuela1.Modelo.Alumno;
 
-public class AlumnoVista extends JFrame {
+public class AlumnoVista extends JPanel {
 
-    private AlumnoControlador controlador = new AlumnoControlador();
+private AlumnoControlador controlador = new AlumnoControlador();
 
     //componentes del frame
     private JTextField txtNombre = new JTextField(20);
@@ -46,14 +46,11 @@ public class AlumnoVista extends JFrame {
     // búsqueda
     private JTextField txtBuscar = new JTextField(15);
 
-    
+    //constructor para GUI
     public AlumnoVista() {
-        setTitle("Gestión de Alumnos");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
+        System.out.println("CONSTRUCTOR EJECUTADO");
+        setLayout(new BorderLayout());
         initComponentes();
-        initEventos();
     }
 
     private void initComponentes() {
@@ -118,7 +115,7 @@ public class AlumnoVista extends JFrame {
     }
 
     private void initEventos() {
-
+        /*
         // ── GUARDAR ───────────────────────────────
         btnGuardar.addActionListener(e -> {
             if (!validarCampos()) {
@@ -237,13 +234,21 @@ public class AlumnoVista extends JFrame {
         txtEmail.setText("");
         txtTelefono.setText("");
         txtDireccion.setText("");
-        comboNivel.setSelectedIndex(0);
+        comboNivel.setSelectedIndex(0);*/
     }
 
-      // Main temporal para probar
+    // Main TEMPORAL SOLO para probar
     public static void main(String[] args) {
-        new AlumnoVista().setVisible(true);
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+
+            AlumnoVista v = new AlumnoVista();
+            v.setVisible(true);
+
+            System.out.println("VENTANA CREADA");
+
+        });
+
     }
 
-    
 }
