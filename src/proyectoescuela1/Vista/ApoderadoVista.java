@@ -95,26 +95,26 @@ public class ApoderadoVista extends JPanel {
     // ── GUARDAR ────────────────────────────
     private void guardar() {
 
-       /* Apoderado a = new Apoderado(
+        Apoderado a = new Apoderado(
                 0,
-                txtNombre.getText(),
-                txtApellidos.getText(),
-                txtDni.getText(),
-                txtEmail.getText(),
-                txtTelefono.getText(),
-                txtDireccion.getText(),
+                txtNombre.getText().trim(),
+                txtApellidos.getText().trim(),
+                txtDni.getText().trim(),
+                txtEmail.getText().trim(),
+                txtTelefono.getText().trim(),
+                txtDireccion.getText().trim(),
                 new Date(),
-                (String) comboParentesco.getSelectedItem(),
-                txtOcupacion.getText()
+                comboParentesco.getSelectedItem().toString(),
+                txtOcupacion.getText().trim()
         );
 
         controlador.registrar(a);
         actualizar();
-        limpiar();
     }
 
-    // ── ELIMINAR ───────────────────────────
+    // ELIMINAR
     private void eliminar() {
+
         int fila = tabla.getSelectedRow();
 
         if (fila == -1) {
@@ -122,14 +122,16 @@ public class ApoderadoVista extends JPanel {
             return;
         }
 
-        String codigo = (String) modelo.getValueAt(fila, 0);
+        String codigo = modelo.getValueAt(fila, 0).toString();
 
         controlador.eliminar(codigo);
-        actualizar();
+
+        actualizar(); // refrescar tabla
     }
 
-    // ── ACTUALIZAR TABLA ───────────────────
+    // ACTUALIZAR TABLA
     private void actualizar() {
+
         modelo.setRowCount(0);
 
         for (Apoderado a : controlador.listar()) {
@@ -143,8 +145,9 @@ public class ApoderadoVista extends JPanel {
         }
     }
 
-    // ── LIMPIAR ────────────────────────────
+    // LIMPIAR
     private void limpiar() {
+
         txtNombre.setText("");
         txtApellidos.setText("");
         txtDni.setText("");
@@ -153,6 +156,5 @@ public class ApoderadoVista extends JPanel {
         txtDireccion.setText("");
         txtOcupacion.setText("");
         comboParentesco.setSelectedIndex(0);
-*/
     }
 }

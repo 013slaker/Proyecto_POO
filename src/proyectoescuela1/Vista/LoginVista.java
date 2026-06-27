@@ -3,7 +3,7 @@ package proyectoescuela1.Vista;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
-import proyectoescuela1.Controlador.LoginControlador;
+import proyectoescuela1.Controlador.*;
 import proyectoescuela1.Modelo.Cuenta;
 import proyectoescuela1.Vista.MenuPrincipalVista;
 

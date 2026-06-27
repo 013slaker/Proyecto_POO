@@ -239,8 +239,8 @@ JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
         JButton btnApoderado = new JButton("Gestión Apoderado");
         asignarImagenBoton(btnApoderado, "/proyectoescuela1/iconos/apoderado.png", 40, 40);
         btnApoderado.addActionListener(e -> {
-            System.out.println("CLICK ALUMNOS");
-            mostrarPanel(new AlumnoVista());
+            System.out.println("CLICK apoderados");
+            mostrarPanel(new ApoderadoVista());
         });
 
         JButton btnDocentes = new JButton("Gestión Docentes");

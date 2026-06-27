@@ -12,11 +12,11 @@ public class Apoderado extends Usuario {
 
     // ── ATRIBUTOS PROPIOS ─────────────────────────────
     private String codigoApoderado;
-    private String parentesco;   
+    private String parentesco;
     private String ocupacion;
     private boolean estadoActivo;
 
-        // código automático
+    // código automático
     private static int contador = 1;
 
     private static String generarCodigo() {
@@ -28,14 +28,15 @@ public class Apoderado extends Usuario {
 
     // CONSTRUCTOR
     public Apoderado(int id, String nombre, String apellidos,
-                     String dni, String email, String telefono,
-                     String direccion, java.util.Date fechaNac,
-                     String parentesco) {
+            String dni, String email, String telefono,
+            String direccion, Date fechaNac,
+            String parentesco, String ocupacion) {
 
         super(id, nombre, apellidos, dni, email, telefono, direccion, fechaNac);
 
         this.codigoApoderado = generarCodigo();
         this.parentesco = parentesco;
+        this.ocupacion = ocupacion;
         this.estadoActivo = true;
     }
 
@@ -74,13 +75,22 @@ public class Apoderado extends Usuario {
         alumno.setApoderado(this);
     }
 
+    public String getOcupacion() {
+        return ocupacion;
+    }
+
+    public void setOcupacion(String ocupacion) {
+        this.ocupacion = ocupacion;
+    }
+
     @Override
     public String toString() {
-        return "Apoderado{" +
-                "codigo='" + codigoApoderado + '\'' +
-                ", nombre='" + getNombreCompleto() + '\'' +
-                ", parentesco='" + parentesco + '\'' +
-                ", activo=" + estadoActivo +
-                '}';
+        return "Apoderado{"
+                + "codigo='" + codigoApoderado + '\''
+                + ", nombre='" + getNombreCompleto() + '\''
+                + ", parentesco='" + parentesco + '\''
+                + ", activo=" + estadoActivo + '\''
+                + ", ocupacion=" + ocupacion
+                + '}';
     }
 }
