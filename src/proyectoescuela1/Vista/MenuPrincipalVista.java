@@ -224,31 +224,34 @@ public class MenuPrincipalVista extends JFrame {
     //MOdulo academico
     private JPanel crearSubMenuAcademico() {
 
-        JPanel panel = new JPanel(new GridLayout(7, 1, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(2, 4, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         JButton btnAlumnos = new JButton("Gestión Alumnos");
         asignarImagenBoton(btnAlumnos, "/proyectoescuela1/iconos/alumno.png", 40, 40);
         btnAlumnos.addActionListener(e -> {
-        System.out.println("CLICK ALUMNOS");
-        mostrarPanel(new AlumnoVista());
+            System.out.println("CLICK ALUMNOS");
+            mostrarPanel(new AlumnoVista());
         });
-        
+
         JButton btnDocentes = new JButton("Gestión Docentes");
         asignarImagenBoton(btnDocentes, "/proyectoescuela1/iconos/docente.png", 40, 40);
-        
+        btnDocentes.addActionListener(e -> {
+            mostrarPanel(new DocenteVista());
+        });
+
         JButton btnCursos = new JButton("Cursos");
         asignarImagenBoton(btnCursos, "/proyectoescuela1/iconos/cursos.png", 40, 40);
-        
+
         JButton btnHorarios = new JButton("Horarios");
         asignarImagenBoton(btnHorarios, "/proyectoescuela1/iconos/horario.png", 40, 40);
-        
+
         JButton btnAsistencia = new JButton("Asistencia");
         asignarImagenBoton(btnAsistencia, "/proyectoescuela1/iconos/asistencia.png", 40, 40);
-        
+
         JButton btnNotas = new JButton("Notas");
         asignarImagenBoton(btnNotas, "/proyectoescuela1/iconos/notas.png", 40, 40);
-        
+
         JButton btnLibretas = new JButton("Libretas de Notas");
 
         panel.add(btnAlumnos);

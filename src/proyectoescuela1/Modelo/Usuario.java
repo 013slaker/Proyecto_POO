@@ -12,6 +12,7 @@ public abstract class Usuario {
     protected String telefono;
     protected String direccion;
     protected Date fechaNac;
+    
 
     // Constructor
     public Usuario(int id, String nombre, String apellidos,
