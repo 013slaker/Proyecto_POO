@@ -1,11 +1,11 @@
 package proyectoescuela1.Vista;
 
+import java.awt.*;
 import java.util.List;
 import javax.swing.*;
-import java.awt.*;
+
 import proyectoescuela1.Controlador.*;
 import proyectoescuela1.Modelo.Cuenta;
-import proyectoescuela1.Vista.MenuPrincipalVista;
 
 public class LoginVista extends JFrame {
 
@@ -27,7 +27,7 @@ public class LoginVista extends JFrame {
 
         // configuración de ventana
         setTitle("Inicio de Sesión");
-        setSize(350, 200);
+        setSize(400, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -36,26 +36,56 @@ public class LoginVista extends JFrame {
         initEventos();
     }
 
+    //para añadir imagen y darle formato
+    private JLabel crearLogo() {
+
+        ImageIcon icono = new ImageIcon(
+                getClass().getResource("/proyectoescuela1/iconos/insignia.png"));
+
+        Image imagen = icono.getImage().getScaledInstance(
+                220,
+                120,
+                Image.SCALE_SMOOTH);
+
+        JLabel lblLogo = new JLabel(new ImageIcon(imagen));
+        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+
+        return lblLogo;
+    }
+
     // -----------------------------
     // INTERFAZ GRÁFICA
     // -----------------------------
     private void initComponentes() {
+        setLayout(new BorderLayout());
 
-        JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
+        // ---------- panel del LOGO ----------
+        JPanel panelLogo = new JPanel();
 
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panelLogo.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+        panelLogo.add(crearLogo());
 
-        // etiquetas y campos
-        panel.add(new JLabel("Usuario:"));
-        panel.add(txtUsuario);
+        // ---------- panel del  FORMULARIO ----------
+        JPanel panelForm = new JPanel(new GridLayout(2, 2, 10, 10));
+        panelForm.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        panelForm.add(new JLabel("Usuario:"));
+        panelForm.add(txtUsuario);
+        panelForm.add(new JLabel("Contraseña:"));
+        panelForm.add(txtContrasena);
 
-        panel.add(new JLabel("Contraseña:"));
-        panel.add(txtContrasena);
+        // ---------- BOTÓN CENTRADO ----------
+        JPanel panelBoton = new JPanel();
+        panelBoton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelBoton.add(btnIngresar);
 
-        panel.add(new JLabel("")); // espacio vacío
-        panel.add(btnIngresar);
+        // PANEL QUE UNE FORMULARIO + BOTÓN
+        JPanel panelContenido = new JPanel(new BorderLayout());
+        panelContenido.add(panelForm, BorderLayout.CENTER);
+        panelContenido.add(panelBoton, BorderLayout.SOUTH);
 
-        add(panel);
+        add(panelLogo, BorderLayout.NORTH);
+        add(panelContenido, BorderLayout.CENTER);
+
     }
 
     // -----------------------------
@@ -78,6 +108,7 @@ public class LoginVista extends JFrame {
                         "Usuario o contraseña incorrectos",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                txtContrasena.setText("");
                 return;
             }
 
