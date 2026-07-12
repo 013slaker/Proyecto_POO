@@ -1,130 +1,108 @@
 package proyectoescuela1.Modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
-public class Alumno extends Usuario {
+// Serializable permite guardar el objeto en archivo .dat
+public class Alumno extends Usuario implements Serializable {
 
-    private String codigoAlumno;
-    private String grado;
-    private String nivel;
-    private boolean estadoActivo;
-    private Date fechaIngreso;
+    // Necesario para serialización — identificador de versión
+    private static final long serialVersionUID = 1L;
 
-    private Apoderado apoderado;
-
-    // ── LISTAS 
-    private List<Nota> notas = new ArrayList<>();
-    private List<Asistencia> asistencias = new ArrayList<>();
-    private List<Matricula> matriculas = new ArrayList<>();
-    private List<Incidencia> incidencias = new ArrayList<>();
-
+    // Contador automático de código
     private static int contador = 1;
 
     private static String generarCodigoAlumno() {
         return "ALUM" + String.format("%04d", contador++);
     }
 
-    public Alumno(int id, String nombre,
-            String apellidos, String dni,
-            String email, String telefono,
-            String direccion, Date fechaNac,
-            String grado, String nivel,
-            Date fechaIngreso, Apoderado apoderado) {
-        super(id, nombre, apellidos, dni, email, telefono, direccion, fechaNac);
+    // Atributos
+    private String  codigoAlumno;
+    private String  grado;
+    private String  nivel;
+    private boolean estadoActivo;
+    private Date    fechaIngreso;
 
+    // Composición — listas internas
+    private List<Nota>       notas       = new ArrayList<>();
+    private List<Asistencia> asistencias = new ArrayList<>();
+    private List<Matricula>  matriculas  = new ArrayList<>();
+    private List<Incidencia> incidencias = new ArrayList<>();
+
+    // Constructor
+    public Alumno(int id, String nombre, String apellidos,
+                  String dni, String email, String telefono,
+                  String direccion, Date fechaNac,
+                  String grado, String nivel, Date fechaIngreso) {
+        super(id, nombre, apellidos, dni, email,
+              telefono, direccion, fechaNac);
         this.codigoAlumno = generarCodigoAlumno();
-        this.grado = grado;
-        this.nivel = nivel;
+        this.grado        = grado;
+        this.nivel        = nivel;
         this.estadoActivo = true;
-
-        
         this.fechaIngreso = fechaIngreso;
-
-        this.apoderado = apoderado;
     }
 
-   
-    public String getCodigoAlumno() {
-        return codigoAlumno;
+    // ── ITERATOR — recorrer notas de forma controlada ──
+    public Iterator<Nota> iteratorNotas() {
+        return notas.iterator();
     }
 
-    public String getGrado() {
-        return grado;
+    // ── ITERATOR — recorrer asistencias ───────────────
+    public Iterator<Asistencia> iteratorAsistencias() {
+        return asistencias.iterator();
     }
 
-    public void setGrado(String grado) {
-        this.grado = grado;
+    @Override
+    public String toString() {
+        return "Alumno{" +
+               "codigo='" + codigoAlumno + "'" +
+               ", nombre='" + getNombreCompleto() + "'" +
+               ", grado='" + grado + "'" +
+               ", nivel='" + nivel + "'" +
+               ", activo=" + estadoActivo +
+               "}";
     }
 
-    public String getNivel() {
-        return nivel;
-    }
+    // Getters
+    public String  getCodigoAlumno() { return codigoAlumno; }
+    public String  getGrado()        { return grado; }
+    public String  getNivel()        { return nivel; }
+    public boolean isEstadoActivo()  { return estadoActivo; }
+    public Date    getFechaIngreso() { return fechaIngreso; }
+    public List<Nota>       getNotas()       { return notas; }
+    public List<Asistencia> getAsistencias() { return asistencias; }
+    public List<Matricula>  getMatriculas()  { return matriculas; }
+    public List<Incidencia> getIncidencias() { return incidencias; }
 
+    // Setters
+    public void setGrado(String grado) { this.grado = grado; }
     public void setNivel(String nivel) {
-        if (!nivel.equals("Primaria") && !nivel.equals("Secundaria")) {
+        if (!nivel.equals("Primaria") && !nivel.equals("Secundaria"))
             throw new IllegalArgumentException(
-                    "Nivel inválido. Use Primaria o Secundaria"
+                "Nivel inválido. Use Primaria o Secundaria"
             );
-        }
         this.nivel = nivel;
     }
-
-    public boolean isEstadoActivo() {
-        return estadoActivo;
-    }
-
     public void setEstadoActivo(boolean estadoActivo) {
         this.estadoActivo = estadoActivo;
     }
-
-    public Date getFechaIngreso() {
-        return fechaIngreso;
-    }
-
     public void setFechaIngreso(Date fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
-
-    // ── RELACIÓN APODERADO ────────────────────────────
-    public Apoderado getApoderado() {
-        return apoderado;
+    public void setNotas(List<Nota> notas) {
+        this.notas = notas;
     }
-
-    public void setApoderado(Apoderado apoderado) {
-        this.apoderado = apoderado;
+    public void setAsistencias(List<Asistencia> asistencias) {
+        this.asistencias = asistencias;
     }
-
-    // ── LISTAS ─────────────────────────────────────────
-    public List<Nota> getNotas() {
-        return notas;
+    public void setMatriculas(List<Matricula> matriculas) {
+        this.matriculas = matriculas;
     }
-
-    public List<Asistencia> getAsistencias() {
-        return asistencias;
-    }
-
-    public List<Matricula> getMatriculas() {
-        return matriculas;
-    }
-
-    public List<Incidencia> getIncidencias() {
-        return incidencias;
-    }
-
-    // ── TO STRING ──────────────────────────────────────
-    @Override
-    public String toString() {
-        return "Alumno{"
-                + "codigo='" + codigoAlumno + '\''
-                + ", nombre='" + getNombreCompleto() + '\''
-                + ", grado='" + grado + '\''
-                + ", nivel='" + nivel + '\''
-                + ", apoderado='"
-                + (apoderado != null ? apoderado.getNombreCompleto() : "Sin asignar")
-                + '\''
-                + ", activo=" + estadoActivo
-                + '}';
+    public void setIncidencias(List<Incidencia> incidencias) {
+        this.incidencias = incidencias;
     }
 }
