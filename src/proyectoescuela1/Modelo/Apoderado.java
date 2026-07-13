@@ -68,13 +68,13 @@ public class Apoderado extends Usuario {
     public void setAlumnos(List<Alumno> alumnos) {
         this.alumnos = alumnos;
     }
-
+/*
     // RELACIÓN
     public void agregarAlumno(Alumno alumno) {
         alumnos.add(alumno);
         alumno.setApoderado(this);
     }
-
+*/
     public String getOcupacion() {
         return ocupacion;
     }
