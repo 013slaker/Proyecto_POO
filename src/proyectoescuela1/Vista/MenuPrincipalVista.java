@@ -90,11 +90,11 @@ public class MenuPrincipalVista extends JFrame {
         //para formato de fecha
         Date fecha = new Date();
 
-SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-String fechaFormateada = formato.format(fecha);
+        String fechaFormateada = formato.format(fecha);
 
-JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
+        JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
 
         panelSuperior.add(titulo, BorderLayout.WEST);
 
@@ -203,7 +203,6 @@ JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
 
     }
 
-    
     //metodos para llamar los paneles con los botones
     private void mostrarPanel(JPanel panel) {
         panelContenido.removeAll();
@@ -224,7 +223,7 @@ JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
             System.out.println("CLICK ALUMNOS");
             mostrarPanel(new AlumnoVista());
         });
-        
+
         JButton btnApoderado = new JButton("Gestión Apoderado");
         asignarImagenBoton(btnApoderado, "/proyectoescuela1/iconos/apoderado.png", 40, 40);
         btnApoderado.addActionListener(e -> {
@@ -240,10 +239,15 @@ JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
 
         JButton btnCursos = new JButton("Cursos");
         asignarImagenBoton(btnCursos, "/proyectoescuela1/iconos/cursos.png", 40, 40);
+        btnCursos.addActionListener(e -> {
+            mostrarPanel(new CursoVista());
+        });
 
         JButton btnHorarios = new JButton("Horarios");
         asignarImagenBoton(btnHorarios, "/proyectoescuela1/iconos/horario.png", 40, 40);
-
+        btnHorarios.addActionListener(e -> {
+            mostrarPanel(new HorarioVista());
+        });
         JButton btnAsistencia = new JButton("Asistencia");
         asignarImagenBoton(btnAsistencia, "/proyectoescuela1/iconos/asistencia.png", 40, 40);
 
