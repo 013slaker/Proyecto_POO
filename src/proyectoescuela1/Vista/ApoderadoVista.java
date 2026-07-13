@@ -1,101 +1,135 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package proyectoescuela1.Vista;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Date;
+import java.util.List;
 import proyectoescuela1.Controlador.ApoderadoControlador;
 import proyectoescuela1.Modelo.Apoderado;
 
 public class ApoderadoVista extends JPanel {
 
-    private ApoderadoControlador controlador = new ApoderadoControlador();
+    // ── CONTROLADOR ───────────────────────────────
+    private ApoderadoControlador controlador =
+            new ApoderadoControlador();
 
-    // ── CAMPOS ─────────────────────────────
-    private JTextField txtNombre = new JTextField(20);
+    // ── CAMPOS ────────────────────────────────────
+    private JTextField txtNombre    = new JTextField(20);
     private JTextField txtApellidos = new JTextField(20);
-    private JTextField txtDni = new JTextField(20);
-    private JTextField txtEmail = new JTextField(20);
-    private JTextField txtTelefono = new JTextField(20);
+    private JTextField txtDni       = new JTextField(20);
+    private JTextField txtEmail     = new JTextField(20);
+    private JTextField txtTelefono  = new JTextField(20);
     private JTextField txtDireccion = new JTextField(20);
     private JTextField txtOcupacion = new JTextField(20);
 
     private String[] parentescos = {"Padre", "Madre", "Tutor"};
-    private JComboBox<String> comboParentesco = new JComboBox<>(parentescos);
+    private JComboBox<String> comboParentesco =
+            new JComboBox<>(parentescos);
 
-    // ── BOTONES ────────────────────────────
-    private JButton btnGuardar = new JButton("Guardar");
-    private JButton btnEliminar = new JButton("Eliminar");
-    private JButton btnLimpiar = new JButton("Limpiar");
+    // ── BOTONES ───────────────────────────────────
+    private JButton btnGuardar    = new JButton("Guardar");
+    private JButton btnActualizar = new JButton("Actualizar");
+    private JButton btnEliminar   = new JButton("Eliminar");
+    private JButton btnLimpiar    = new JButton("Limpiar");
+    private JButton btnBuscar     = new JButton("Buscar");
 
-    // ── TABLA ──────────────────────────────
-    private DefaultTableModel modelo = new DefaultTableModel(
-            new String[]{"Código", "Nombre", "DNI", "Parentesco", "Ocupación"}, 0
-    );
+    // ── BÚSQUEDA ──────────────────────────────────
+    private JTextField txtBuscar = new JTextField(15);
 
-    private JTable tabla = new JTable(modelo);
+    // ── TABLA ─────────────────────────────────────
+    private String[] columnas = {
+        "Código", "Nombre", "DNI",
+        "Parentesco", "Ocupación", "Estado"
+    };
+    private DefaultTableModel modeloTabla =
+        new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int f, int c) {
+                return false;
+            }
+        };
+    private JTable tabla = new JTable(modeloTabla);
 
+    // Código del apoderado seleccionado
+    private String codigoSeleccionado = null;
+
+    // ── CONSTRUCTOR ───────────────────────────────
     public ApoderadoVista() {
         setLayout(new BorderLayout(10, 10));
         initUI();
         initEventos();
+        actualizarTabla(controlador.listar());
     }
 
-    // ── INTERFAZ ───────────────────────────
+    // ── INTERFAZ ──────────────────────────────────
     private void initUI() {
 
-        JPanel form = new JPanel(new GridLayout(7, 2, 5, 5));
-        form.setBorder(BorderFactory.createTitledBorder("Datos del Apoderado"));
-
+        // FORMULARIO
+        JPanel form = new JPanel(new GridLayout(8, 2, 5, 5));
+        form.setBorder(BorderFactory.createTitledBorder(
+            "Datos del Apoderado"
+        ));
         form.add(new JLabel("Nombre:"));
         form.add(txtNombre);
-
         form.add(new JLabel("Apellidos:"));
         form.add(txtApellidos);
-
         form.add(new JLabel("DNI:"));
         form.add(txtDni);
-
         form.add(new JLabel("Email:"));
         form.add(txtEmail);
-
         form.add(new JLabel("Teléfono:"));
         form.add(txtTelefono);
-
+        form.add(new JLabel("Dirección:"));
+        form.add(txtDireccion);
         form.add(new JLabel("Parentesco:"));
         form.add(comboParentesco);
-
         form.add(new JLabel("Ocupación:"));
         form.add(txtOcupacion);
 
-        JPanel botones = new JPanel();
-        botones.add(btnGuardar);
-        botones.add(btnEliminar);
-        botones.add(btnLimpiar);
+        // BOTONES
+        JPanel panelBotones = new JPanel(new FlowLayout());
+        panelBotones.add(btnGuardar);
+        panelBotones.add(btnActualizar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
 
-        add(form, BorderLayout.NORTH);
-        add(botones, BorderLayout.CENTER);
-        add(new JScrollPane(tabla), BorderLayout.SOUTH);
+        // BÚSQUEDA
+        JPanel panelBuscar = new JPanel(new FlowLayout(
+            FlowLayout.LEFT
+        ));
+        panelBuscar.add(new JLabel("Buscar:"));
+        panelBuscar.add(txtBuscar);
+        panelBuscar.add(btnBuscar);
+
+        // PANEL SUPERIOR
+        JPanel panelSuperior = new JPanel(new BorderLayout());
+        panelSuperior.add(form,          BorderLayout.CENTER);
+        panelSuperior.add(panelBotones,  BorderLayout.SOUTH);
+
+        // TABLA
+        JScrollPane scroll = new JScrollPane(tabla);
+        scroll.setBorder(BorderFactory.createTitledBorder(
+            "Lista de Apoderados"
+        ));
+
+        // PANEL INFERIOR
+        JPanel panelInferior = new JPanel(new BorderLayout());
+        panelInferior.add(panelBuscar, BorderLayout.NORTH);
+        panelInferior.add(scroll,      BorderLayout.CENTER);
+
+        add(panelSuperior, BorderLayout.NORTH);
+        add(panelInferior, BorderLayout.CENTER);
     }
 
-    // ── EVENTOS ────────────────────────────
+    // ── EVENTOS ───────────────────────────────────
     private void initEventos() {
 
-        btnGuardar.addActionListener(e -> guardar());
+        // GUARDAR
+        btnGuardar.addActionListener(e -> {
+            if (!validarCampos()) return;
 
-        btnEliminar.addActionListener(e -> eliminar());
-
-        btnLimpiar.addActionListener(e -> limpiar());
-    }
-
-    // ── GUARDAR ────────────────────────────
-    private void guardar() {
-
-        Apoderado a = new Apoderado(
+            Apoderado a = new Apoderado(
                 0,
                 txtNombre.getText().trim(),
                 txtApellidos.getText().trim(),
@@ -106,48 +140,175 @@ public class ApoderadoVista extends JPanel {
                 new Date(),
                 comboParentesco.getSelectedItem().toString(),
                 txtOcupacion.getText().trim()
-        );
+            );
 
-        controlador.registrar(a);
-        actualizar();
+            controlador.registrar(a);
+            actualizarTabla(controlador.listar());
+            limpiar();
+            JOptionPane.showMessageDialog(this,
+                "Apoderado registrado: " + a.getCodigoApoderado(),
+                "Éxito", JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+
+        // ACTUALIZAR
+        btnActualizar.addActionListener(e -> {
+            if (codigoSeleccionado == null) {
+                JOptionPane.showMessageDialog(this,
+                    "Selecciona un apoderado de la tabla.",
+                    "Aviso", JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            if (!validarCampos()) return;
+
+            Apoderado original = controlador
+                .buscarPorCodigo(codigoSeleccionado);
+
+            if (original == null) return;
+
+            // actualiza atributos de Usuario (padre)
+            original.setNombre(txtNombre.getText().trim());
+            original.setApellidos(txtApellidos.getText().trim());
+            original.setDni(txtDni.getText().trim());
+            original.setEmail(txtEmail.getText().trim());
+            original.setTelefono(txtTelefono.getText().trim());
+            original.setDireccion(txtDireccion.getText().trim());
+
+            // actualiza atributos propios
+            original.setParentesco(
+                comboParentesco.getSelectedItem().toString()
+            );
+            original.setOcupacion(txtOcupacion.getText().trim());
+
+            controlador.guardarDatos();
+            actualizarTabla(controlador.listar());
+            limpiar();
+            JOptionPane.showMessageDialog(this,
+                "Apoderado actualizado correctamente.",
+                "Éxito", JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+
+        // ELIMINAR
+        btnEliminar.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+            if (fila == -1) {
+                JOptionPane.showMessageDialog(this,
+                    "Selecciona un apoderado de la tabla.",
+                    "Aviso", JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+            String codigo = modeloTabla
+                .getValueAt(fila, 0).toString();
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Eliminar al apoderado " + codigo + "?",
+                "Confirmar", JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                controlador.eliminar(codigo);
+                actualizarTabla(controlador.listar());
+                limpiar();
+            }
+        });
+
+        // LIMPIAR
+        btnLimpiar.addActionListener(e -> limpiar());
+
+        // BUSCAR
+        btnBuscar.addActionListener(e -> {
+            String texto = txtBuscar.getText().trim();
+            if (texto.isEmpty()) {
+                actualizarTabla(controlador.listar());
+            } else {
+                actualizarTabla(
+                    controlador.buscarPorNombre(texto)
+                );
+            }
+        });
+
+        // CLICK EN TABLA — carga datos en formulario
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int fila = tabla.getSelectedRow();
+                if (fila == -1) return;
+
+                codigoSeleccionado = modeloTabla
+                    .getValueAt(fila, 0).toString();
+
+                Apoderado a = controlador
+                    .buscarPorCodigo(codigoSeleccionado);
+
+                if (a != null) {
+                    txtNombre.setText(a.getNombre());
+                    txtApellidos.setText(a.getApellidos());
+                    txtDni.setText(a.getDni());
+                    txtEmail.setText(a.getEmail());
+                    txtTelefono.setText(a.getTelefono());
+                    txtDireccion.setText(a.getDireccion());
+                    comboParentesco.setSelectedItem(
+                        a.getParentesco()
+                    );
+                    txtOcupacion.setText(a.getOcupacion());
+                }
+            }
+        });
     }
 
-    // ELIMINAR
-    private void eliminar() {
-
-        int fila = tabla.getSelectedRow();
-
-        if (fila == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccione un apoderado");
-            return;
+    // ── VALIDAR CAMPOS ────────────────────────────
+    private boolean validarCampos() {
+        if (txtNombre.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "El nombre es obligatorio.",
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+            return false;
         }
-
-        String codigo = modelo.getValueAt(fila, 0).toString();
-
-        controlador.eliminar(codigo);
-
-        actualizar(); // refrescar tabla
+        if (txtApellidos.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Los apellidos son obligatorios.",
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+            return false;
+        }
+        if (txtDni.getText().trim().length() != 8) {
+            JOptionPane.showMessageDialog(this,
+                "El DNI debe tener 8 dígitos.",
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+            return false;
+        }
+        if (txtOcupacion.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "La ocupación es obligatoria.",
+                "Error", JOptionPane.ERROR_MESSAGE
+            );
+            return false;
+        }
+        return true;
     }
 
-    // ACTUALIZAR TABLA
-    private void actualizar() {
-
-        modelo.setRowCount(0);
-
-        for (Apoderado a : controlador.listar()) {
-            modelo.addRow(new Object[]{
+    // ── ACTUALIZAR TABLA ──────────────────────────
+    private void actualizarTabla(List<Apoderado> lista) {
+        modeloTabla.setRowCount(0);
+        for (Apoderado a : lista) {
+            modeloTabla.addRow(new Object[]{
                 a.getCodigoApoderado(),
                 a.getNombreCompleto(),
                 a.getDni(),
                 a.getParentesco(),
-                a.getOcupacion()
+                a.getOcupacion(),
+                a.isEstadoActivo() ? "Activo" : "Inactivo"
             });
         }
+        modeloTabla.fireTableDataChanged();
+        tabla.repaint();
     }
 
-    // LIMPIAR
+    // ── LIMPIAR CAMPOS ────────────────────────────
     private void limpiar() {
-
         txtNombre.setText("");
         txtApellidos.setText("");
         txtDni.setText("");
@@ -156,5 +317,8 @@ public class ApoderadoVista extends JPanel {
         txtDireccion.setText("");
         txtOcupacion.setText("");
         comboParentesco.setSelectedIndex(0);
+        txtBuscar.setText("");
+        tabla.clearSelection();
+        codigoSeleccionado = null;
     }
 }

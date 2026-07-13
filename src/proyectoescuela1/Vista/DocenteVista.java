@@ -2,6 +2,7 @@ package proyectoescuela1.Vista;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.util.Date;
 import java.util.List;
@@ -37,38 +38,23 @@ public class DocenteVista extends JPanel {
     // COMBOBOX
     //==================================================
     // El usuario elegirá uno de estos niveles
-    private String[] niveles = {
-        "Inicial",
-        "Primaria",
-        "Secundaria"
-    };
-
-    private JComboBox<String> comboNivel
-            = new JComboBox<>(niveles);
+    private String[] niveles = {"Inicial", "Primaria", "Secundaria"};
+    private JComboBox<String> comboNivel = new JComboBox<>(niveles);
 
     //==================================================
     // BOTONES
     //==================================================
-    private JButton btnGuardar
-            = new JButton("Guardar");
-
-    private JButton btnActualizar
-            = new JButton("Actualizar");
-
-    private JButton btnEliminar
-            = new JButton("Eliminar");
-
-    private JButton btnLimpiar
-            = new JButton("Limpiar");
-
-    private JButton btnBuscar
-            = new JButton("Buscar");
+    private JButton btnGuardar = new JButton("Guardar");
+    private JButton btnActualizar = new JButton("Actualizar");
+    private JButton btnEliminar = new JButton("Eliminar");
+    private JButton btnLimpiar = new JButton("Limpiar");
+    private JButton btnBuscar = new JButton("Buscar");
+    private JButton btnBusquedaAvanzada = new JButton("Búsqueda Avanzada");
 
     //==================================================
     // CAMPO DE BÚSQUEDA
     //==================================================
-    private JTextField txtBuscar
-            = new JTextField(18);
+    private JTextField txtBuscar = new JTextField(18);
 
     //==================================================
     // TABLA
@@ -91,18 +77,20 @@ public class DocenteVista extends JPanel {
         // Evita que el usuario edite la tabla
         @Override
         public boolean isCellEditable(int fila, int columna) {
-
             return false;
-
         }
 
     };
 
     // Tabla
-    private JTable tabla
-            = new JTable(modeloTabla);
+    private JTable tabla = new JTable(modeloTabla);
 
+//==================================================
+    // CÓDIGO DEL DOCENTE SELECCIONADO  
     //==================================================
+    private String codigoSeleccionado = null;
+
+//==================================================
     // CONSTRUCTOR
     //==================================================
     public DocenteVista() {
@@ -198,6 +186,8 @@ public class DocenteVista extends JPanel {
 
         panelBuscar.add(btnBuscar);
 
+        panelBuscar.add(btnBusquedaAvanzada);
+
         //====================================================
         // PANEL SUPERIOR
         //====================================================
@@ -230,7 +220,7 @@ public class DocenteVista extends JPanel {
         add(panelInferior, BorderLayout.CENTER);
     }
 
-    // ======================================================
+// ======================================================
 // EVENTOS
 // ======================================================
     private void initEventos() {
@@ -317,6 +307,95 @@ public class DocenteVista extends JPanel {
         });
 
         // --------------------------------------------------
+        // CLICK EN TABLA — carga datos en el formulario
+        // --------------------------------------------------
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int fila = tabla.getSelectedRow();
+                if (fila == -1) {
+                    return;
+                }
+
+                // guarda el código del docente seleccionado
+                codigoSeleccionado = modeloTabla
+                        .getValueAt(fila, 0).toString();
+
+                // busca el docente y carga sus datos en el formulario
+                Docente d = controlador
+                        .buscarPorCodigo(codigoSeleccionado);
+
+                if (d != null) {
+                    txtNombre.setText(d.getNombre());
+                    txtApellidos.setText(d.getApellidos());
+                    txtDni.setText(d.getDni());
+                    txtEmail.setText(d.getEmail());
+                    txtTelefono.setText(d.getTelefono());
+                    txtDireccion.setText(d.getDireccion());
+                    txtEspecialidad.setText(d.getEspecialidad());
+                    comboNivel.setSelectedItem(d.getNivel());
+                }
+            }
+        });
+
+        // --------------------------------------------------
+        // BOTÓN Actualizar
+        // --------------------------------------------------
+        btnActualizar.addActionListener(e -> {
+
+            if (codigoSeleccionado == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Primero selecciona un docente de la tabla.",
+                        "Aviso",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (!validarCampos()) {
+                return;
+            }
+
+            // busca el docente en la lista
+            Docente original = controlador.buscarPorCodigo(codigoSeleccionado);
+
+            if (original == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No se encontró el docente.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            // modifica los atributos
+            original.setNombre(txtNombre.getText().trim());
+            original.setApellidos(txtApellidos.getText().trim());
+            original.setDni(txtDni.getText().trim());
+            original.setEmail(txtEmail.getText().trim());
+            original.setTelefono(txtTelefono.getText().trim());
+            original.setDireccion(txtDireccion.getText().trim());
+
+            // ── actualiza atributos propios de Docente ──
+            original.setEspecialidad(txtEspecialidad.getText().trim());
+            original.setNivel(comboNivel.getSelectedItem().toString());
+
+            // guarda y refresca
+            controlador.guardarDatos();
+            actualizarTabla(controlador.listarTodos());
+            limpiarCampos();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Docente actualizado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+
+        // --------------------------------------------------
         // BOTÓN LIMPIAR
         // --------------------------------------------------
         btnLimpiar.addActionListener(e -> limpiarCampos());
@@ -340,6 +419,20 @@ public class DocenteVista extends JPanel {
 
             }
 
+        });
+        // --------------------------------------------------
+        // BOTÓN PARA ABRIR UNA VENTANA DE DIALOGO DE BUSQUEDA AVANZADA
+        // --------------------------------------------------
+
+        btnBusquedaAvanzada.addActionListener(e -> {
+            // obtiene la ventana padre
+            Frame padre = (Frame) SwingUtilities.getWindowAncestor(this);
+
+            // abre el dialog — bloquea la ventana principal
+            BusquedaAvanzadaDocenteDialog dialog
+                    = new BusquedaAvanzadaDocenteDialog(padre, controlador);
+
+            dialog.setVisible(true);
         });
 
     }
@@ -405,12 +498,13 @@ public class DocenteVista extends JPanel {
 // ======================================================
     private void actualizarTabla(List<Docente> lista) {
 
-        // Borra todas las filas actuales
-        modeloTabla.setRowCount(0);
+        // elimina todas las filas
+        while (modeloTabla.getRowCount() > 0) {
+            modeloTabla.removeRow(0);
+        }
 
-        // Recorre la lista recibida y llena la tabla
+        // agrega las filas nuevas
         for (Docente d : lista) {
-
             modeloTabla.addRow(new Object[]{
                 d.getCodigoDocente(),
                 d.getNombreCompleto(),
@@ -419,9 +513,12 @@ public class DocenteVista extends JPanel {
                 d.getNivel(),
                 d.isEstadoActivo() ? "Activo" : "Inactivo"
             });
-
         }
 
+        // fuerza el repintado
+        modeloTabla.fireTableDataChanged();
+        tabla.repaint();
+        tabla.revalidate();
     }
 
 // ======================================================
