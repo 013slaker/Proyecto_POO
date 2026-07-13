@@ -1,148 +1,246 @@
-
 package proyectoescuela1.Controlador;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 import proyectoescuela1.Modelo.Alumno;
-import proyectoescuela1.Modelo.Asistencia;
 import proyectoescuela1.Modelo.Nota;
 
-
 public class AlumnoControlador {
-   private List<Alumno> alumnos = new ArrayList<>();
-   
-//boton de registro
-public void registrarAlumno(Alumno alumno) {
+
+    // ── BASE DE DATOS EN MEMORIA (ArrayList) ──────
+    private List<Alumno> alumnos = new ArrayList<>();
+
+    // Archivo para persistencia
+    private static final String ARCHIVO = "alumnos.dat";
+
+    // Constructor — carga datos al iniciar
+    public AlumnoControlador() {
+        cargarDatos();
+    }
+
+    // ══════════════════════════════════════════════
+    //  CRUD BÁSICO
+    // ══════════════════════════════════════════════
+
+    // Registra un alumno y guarda en archivo
+    public void registrarAlumno(Alumno alumno) {
         alumnos.add(alumno);
-        System.out.println("Alumno registrado: " + 
-                           alumno.getCodigoAlumno() + " - " + 
-                           alumno.getNombreCompleto());
+        guardarDatos(); // serialización automática
+        System.out.println("Alumno registrado: " +
+                alumno.getCodigoAlumno() + " - " +
+                alumno.getNombreCompleto());
     }
-//boton eliminar
-public void eliminarAlumno(String codigo) {
-        Alumno encontrado = buscarPorCodigo(codigo);
-        if (encontrado != null) {
-            alumnos.remove(encontrado);
-            System.out.println("Alumno eliminado: " + codigo);
-        } else {
-            System.out.println("Alumno no encontrado: " + codigo);
+
+    // Elimina usando Iterator — forma segura de eliminar
+    // mientras se recorre la lista
+    public void eliminarAlumno(String codigo) {
+        Iterator<Alumno> it = alumnos.iterator();
+        while (it.hasNext()) {
+            Alumno a = it.next();
+            if (a.getCodigoAlumno().equals(codigo)) {
+                it.remove(); // elimina sin ConcurrentModificationException
+                guardarDatos();
+                System.out.println("Alumno eliminado: " + codigo);
+                return;
+            }
         }
+        System.out.println("Alumno no encontrado: " + codigo);
     }
-//boton actualizar 
-public void actualizarAlumno(Alumno alumno) {
+
+    // Actualiza datos de un alumno existente
+    public void actualizarAlumno(Alumno alumno) {
         for (int i = 0; i < alumnos.size(); i++) {
             if (alumnos.get(i).getCodigoAlumno()
-                       .equals(alumno.getCodigoAlumno())) {
+                    .equals(alumno.getCodigoAlumno())) {
                 alumnos.set(i, alumno);
-                System.out.println("Alumno actualizado: " + 
-                                   alumno.getCodigoAlumno());
+                guardarDatos();
+                System.out.println("Alumno actualizado: " +
+                        alumno.getCodigoAlumno());
                 return;
             }
         }
         System.out.println("Alumno no encontrado para actualizar.");
     }
 
-//arreglos para almacenamiento 
-public List<Alumno> listarTodos() {
+    // ══════════════════════════════════════════════
+    //  BÚSQUEDAS
+    // ══════════════════════════════════════════════
+
+    // Retorna todos los alumnos
+    public List<Alumno> listarTodos() {
         return alumnos;
     }
 
+    // Busca por código usando Lambda
     public Alumno buscarPorCodigo(String codigo) {
-        for (Alumno a : alumnos) {
-            if (a.getCodigoAlumno().equals(codigo)) {
-                return a;
-            }
-        }
-        return null;
+        return alumnos.stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo))
+                .findFirst()
+                .orElse(null);
     }
-//metodos de busqueda
+
+    // Busca por DNI usando Lambda
     public Alumno buscarPorDni(String dni) {
-        for (Alumno a : alumnos) {
-            if (a.getDni().equals(dni)) {
-                return a;
-            }
-        }
-        return null;
+        return alumnos.stream()
+                .filter(a -> a.getDni().equals(dni))
+                .findFirst()
+                .orElse(null);
     }
 
-    public List<Alumno> buscarPorNivel(String nivel) {
-        List<Alumno> resultado = new ArrayList<>();
-        for (Alumno a : alumnos) {
-            if (a.getNivel().equals(nivel)) {
-                resultado.add(a);
-            }
-        }
-        return resultado;
-    }
-
+    // Busca por nombre usando Lambda — no distingue mayúsculas
     public List<Alumno> buscarPorNombre(String nombre) {
-        List<Alumno> resultado = new ArrayList<>();
-        for (Alumno a : alumnos) {
-            if (a.getNombreCompleto()
-                 .toLowerCase()
-                 .contains(nombre.toLowerCase())) {
-                resultado.add(a);
-            }
-        }
-        return resultado;
+        return alumnos.stream()
+                .filter(a -> a.getNombreCompleto()
+                        .toLowerCase()
+                        .contains(nombre.toLowerCase()))
+                .collect(Collectors.toList());
     }
-    
+
+    // Filtra por nivel usando Lambda
+    public List<Alumno> buscarPorNivel(String nivel) {
+        return alumnos.stream()
+                .filter(a -> a.getNivel().equals(nivel))
+                .collect(Collectors.toList());
+    }
+
+    // Filtra solo alumnos activos usando Lambda
+    public List<Alumno> listarActivos() {
+        return alumnos.stream()
+                .filter(a -> a.isEstadoActivo())
+                .collect(Collectors.toList());
+    }
+
+    // ══════════════════════════════════════════════
+    //  MÉTODOS DE NOTAS — Lambda
+    // ══════════════════════════════════════════════
+
+    // Agrega nota a un alumno
     public void agregarNota(String codigoAlumno, Nota nota) {
         Alumno alumno = buscarPorCodigo(codigoAlumno);
         if (alumno != null) {
             alumno.getNotas().add(nota);
-            System.out.println("Nota agregada al alumno: " + 
-                               codigoAlumno);
+            guardarDatos();
+            System.out.println("Nota agregada: " + codigoAlumno);
         }
-    }
-/*
-    public double calcularPromedioGeneral(String codigoAlumno) {
-        Alumno alumno = buscarPorCodigo(codigoAlumno);
-        if (alumno == null || alumno.getNotas().isEmpty()) 
-            return 0.0;
-        double suma = 0;
-        for (Nota n : alumno.getNotas()) {
-            suma += n.getValor();
-        }
-        return suma / alumno.getNotas().size();
     }
 
+    // Calcula promedio general usando Lambda mapToDouble
+    public double calcularPromedioGeneral(String codigoAlumno) {
+        Alumno alumno = buscarPorCodigo(codigoAlumno);
+        if (alumno == null || alumno.getNotas().isEmpty())
+            return 0.0;
+        // Lambda: suma todos los valores y calcula promedio
+        return alumno.getNotas().stream()
+                .mapToDouble(Nota::getValor)
+                .average()
+                .orElse(0.0);
+    }
+
+    // Calcula promedio por bimestre usando Lambda
     public double calcularPromedioBimestre(
             String codigoAlumno, int bimestre) {
         Alumno alumno = buscarPorCodigo(codigoAlumno);
         if (alumno == null) return 0.0;
-        List<Nota> notasBim = new ArrayList<>();
-        for (Nota n : alumno.getNotas()) {
-            if (n.getBimestre() == bimestre) {
-                notasBim.add(n);
-            }
-        }
-        if (notasBim.isEmpty()) return 0.0;
-        double suma = 0;
-        for (Nota n : notasBim) suma += n.getValor();
-        return suma / notasBim.size();
+        // Lambda: filtra por bimestre y calcula promedio
+        return alumno.getNotas().stream()
+                .filter(n -> n.getBimestre() == bimestre)
+                .mapToDouble(Nota::getValor)
+                .average()
+                .orElse(0.0);
     }
 
+    // Verifica si está aprobado — promedio >= 11
     public boolean estaAprobado(String codigoAlumno) {
         return calcularPromedioGeneral(codigoAlumno) >= 11;
     }
 
-    // Ranking de alumnos por promedio — uso de Map
+    // Lista alumnos desaprobados usando Lambda
+    public List<Alumno> alumnosDesaprobados() {
+        return alumnos.stream()
+                .filter(a -> !estaAprobado(a.getCodigoAlumno()))
+                .collect(Collectors.toList());
+    }
+
+    // Ranking de promedios usando Lambda y Map
     public Map<String, Double> rankingPromedios() {
         Map<String, Double> ranking = new HashMap<>();
-        for (Alumno a : alumnos) {
-            ranking.put(
+        // Lambda: recorre todos y calcula promedio de cada uno
+        alumnos.forEach(a -> ranking.put(
                 a.getNombreCompleto(),
                 calcularPromedioGeneral(a.getCodigoAlumno())
-            );
-        }
+        ));
         return ranking;
-    }*/
+    }
 
+    // Ordena alumnos por apellido usando Lambda
+    public List<Alumno> ordenarPorApellido() {
+        return alumnos.stream()
+                .sorted((a, b) -> a.getApellidos()
+                        .compareTo(b.getApellidos()))
+                .collect(Collectors.toList());
+    }
 
+    // ══════════════════════════════════════════════
+    //  ESTADÍSTICAS
+    // ══════════════════════════════════════════════
 
+    // Total de alumnos registrados
+    public int totalAlumnos() {
+        return alumnos.size();
+    }
+
+    // Total por nivel usando Lambda
+    public long totalPorNivel(String nivel) {
+        return alumnos.stream()
+                .filter(a -> a.getNivel().equals(nivel))
+                .count();
+    }
+
+    // Elimina todos los inactivos usando Iterator
+    public void eliminarInactivos() {
+        Iterator<Alumno> it = alumnos.iterator();
+        while (it.hasNext()) {
+            Alumno a = it.next();
+            if (!a.isEstadoActivo()) {
+                it.remove();
+                System.out.println("Inactivo eliminado: " +
+                        a.getCodigoAlumno());
+            }
+        }
+        guardarDatos();
+    }
+
+    // ══════════════════════════════════════════════
+    //  SERIALIZACIÓN — guardar y cargar datos
+    // ══════════════════════════════════════════════
+
+    // Guarda la lista en archivo .dat (serialización)
+    public void guardarDatos() {
+        try (ObjectOutputStream out = new ObjectOutputStream(
+                new FileOutputStream(ARCHIVO))) {
+            out.writeObject(alumnos);
+            System.out.println("Datos guardados correctamente.");
+        } catch (IOException e) {
+            System.out.println("Error al guardar: " + e.getMessage());
+        }
+    }
+
+    // Carga la lista desde archivo .dat (deserialización)
+    @SuppressWarnings("unchecked")
+    public void cargarDatos() {
+        File archivo = new File(ARCHIVO);
+        if (!archivo.exists()) {
+            System.out.println("Sin datos previos. Iniciando vacío.");
+            return;
+        }
+        try (ObjectInputStream in = new ObjectInputStream(
+                new FileInputStream(ARCHIVO))) {
+            alumnos = (List<Alumno>) in.readObject();
+            System.out.println("Datos cargados: " +
+                    alumnos.size() + " alumnos.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error al cargar: " + e.getMessage());
+        }
+    }
 }

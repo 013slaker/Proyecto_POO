@@ -12,14 +12,14 @@ public class LoginControlador {
         this.cuentas = cuentas;
     }
 
-    // ahora devuelve la cuenta, no el rol
+    // devuelve la cuenta, no el rol
     public Cuenta validarLogin(String usuario, String contrasena) {
-
         for (Cuenta c : cuentas) {
-            if (c.login(usuario, contrasena)) {
+            if (c.getUsuario().equals(usuario) &&
+                c.getContrasena().equals(contrasena)) {
                 return c;
             }
         }
         return null;
     }
-}
+}    

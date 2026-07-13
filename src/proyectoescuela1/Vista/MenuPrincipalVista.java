@@ -203,18 +203,7 @@ JLabel fechaIngreso = new JLabel("Ingreso: " + fechaFormateada);
 
     }
 
-    public static void main(String[] args) {
-
-        SwingUtilities.invokeLater(() -> {
-
-            List<Cuenta> cuentas = new ArrayList<>();
-            cuentas.add(new Cuenta(1, "director1", "admin123", "DIRECTOR"));
-            cuentas.add(new Cuenta(2, "secretaria1", "admin123", "SECRETARIA"));
-
-            new LoginVista(cuentas).setVisible(true);
-        });
-    }
-
+    
     //metodos para llamar los paneles con los botones
     private void mostrarPanel(JPanel panel) {
         panelContenido.removeAll();

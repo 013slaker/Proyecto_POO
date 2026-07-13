@@ -11,9 +11,9 @@ public class ProyectoEscuela1 {
 
     public static void main(String[] args) {
         List<Cuenta> cuentas = new ArrayList<>();
-        cuentas.add(new Cuenta(1, "director", "admin123", "DIRECTOR"));
+        cuentas.add(new Cuenta(1, "director1", "admin123", "DIRECTOR"));
         cuentas.add(new Cuenta(2, "secretaria1", "secre123", "SECRETARIA"));
-        cuentas.add(new Cuenta(3, "Tesoreria1", "teso123", "TESORERO"));
+        cuentas.add(new Cuenta(3, "tesoreria1", "teso123", "TESORERO"));
         
         new LoginVista(cuentas).setVisible(true);
         
