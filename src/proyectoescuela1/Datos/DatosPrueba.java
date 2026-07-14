@@ -38,8 +38,8 @@ public class DatosPrueba {
     // RegistroAsistenciaControlador es ahora la ÚNICA fuente de datos
     // de asistencia (ver el nuevo AsistenciaControlador, que ya no
     // guarda nada por su cuenta y solo consulta estos registros).
-    private RegistroAsistenciaControlador regAsisCtrl
-            = new RegistroAsistenciaControlador();
+    private AsistenciaControlador regAsisCtrl
+            = new AsistenciaControlador();
 
     // ── MÉTODO PRINCIPAL ──────────────────────────
     /**

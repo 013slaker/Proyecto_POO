@@ -251,7 +251,7 @@ public class MenuPrincipalVista extends JFrame {
         JButton btnAsistencia = new JButton("Asistencia");
         asignarImagenBoton(btnAsistencia, "/proyectoescuela1/iconos/asistencia.png", 40, 40);
         btnAsistencia.addActionListener(e -> {
-           mostrarPanel(new RegistroAsistenciaVista()); 
+           mostrarPanel(new AsistenciaVista()); 
         });
         
         JButton btnNotas = new JButton("Notas");
