@@ -19,37 +19,48 @@ public class AlumnoVista extends JPanel {
     private AlumnoControlador controlador = new AlumnoControlador();
 
     // ── CAMPOS DEL FORMULARIO ─────────────────────
-    private JTextField txtNombre    = new JTextField(20);
+    private JTextField txtNombre = new JTextField(20);
     private JTextField txtApellidos = new JTextField(20);
-    private JTextField txtDni       = new JTextField(20);
-    private JTextField txtEmail     = new JTextField(20);
-    private JTextField txtTelefono  = new JTextField(20);
+    private JTextField txtDni = new JTextField(20);
+    private JTextField txtEmail = new JTextField(20);
+    private JTextField txtTelefono = new JTextField(20);
     private JTextField txtDireccion = new JTextField(20);
-    private JTextField txtGrado     = new JTextField(20);
-
     private String[] niveles = {"Primaria", "Secundaria"};
+    private JComboBox<String> comboGrado = new JComboBox<>();
+
     private JComboBox<String> comboNivel = new JComboBox<>(niveles);
 
+    private String[] secciones = {"A", "B", "C"};
+    private JComboBox<String> comboSeccion = new JComboBox<>(secciones);
+
+    private final String[] gradosPrimaria = {
+        "1°", "2°", "3°", "4°", "5°", "6°"
+    };
+
+    private final String[] gradosSecundaria = {
+        "1°", "2°", "3°", "4°", "5°"
+    };
+
     // ── BOTONES ───────────────────────────────────
-    private JButton btnGuardar    = new JButton("Guardar");
-    private JButton btnEliminar   = new JButton("Eliminar");
+    private JButton btnGuardar = new JButton("Guardar");
+    private JButton btnEliminar = new JButton("Eliminar");
     private JButton btnActualizar = new JButton("Actualizar");
-    private JButton btnLimpiar    = new JButton("Limpiar");
-    private JButton btnBuscar     = new JButton("Buscar");
+    private JButton btnLimpiar = new JButton("Limpiar");
+    private JButton btnBuscar = new JButton("Buscar");
 
     // ── TABLA ─────────────────────────────────────
     private String[] columnas = {
-        "Código", "Nombre", "Apellidos", "DNI", 
-        "Grado", "Nivel", "Estado"
+        "Código", "Nombre", "Apellidos", "DNI",
+        "Grado", "Sección", "Nivel", "Estado"
     };
-    private DefaultTableModel modeloTabla = 
-        new DefaultTableModel(columnas, 0) {
-            // hace que las celdas no sean editables
-            @Override
-            public boolean isCellEditable(int row, int col) {
-                return false;
-            }
-        };
+    private DefaultTableModel modeloTabla
+            = new DefaultTableModel(columnas, 0) {
+        // hace que las celdas no sean editables
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+    };
     private JTable tabla = new JTable(modeloTabla);
 
     // ── BÚSQUEDA ──────────────────────────────────
@@ -69,11 +80,12 @@ public class AlumnoVista extends JPanel {
 
     // ── INTERFAZ GRÁFICA ──────────────────────────
     private void initComponentes() {
+        cargarGrados();
 
         // FORMULARIO
-        JPanel panelForm = new JPanel(new GridLayout(8, 2, 5, 5));
+        JPanel panelForm = new JPanel(new GridLayout(0, 2, 5, 5));
         panelForm.setBorder(BorderFactory.createTitledBorder(
-            "Datos del Alumno"
+                "Datos del Alumno"
         ));
         panelForm.add(new JLabel("Nombre:"));
         panelForm.add(txtNombre);
@@ -87,10 +99,12 @@ public class AlumnoVista extends JPanel {
         panelForm.add(txtTelefono);
         panelForm.add(new JLabel("Dirección:"));
         panelForm.add(txtDireccion);
-        panelForm.add(new JLabel("Grado:"));
-        panelForm.add(txtGrado);
         panelForm.add(new JLabel("Nivel:"));
         panelForm.add(comboNivel);
+        panelForm.add(new JLabel("Grado:"));
+        panelForm.add(comboGrado);
+        panelForm.add(new JLabel("Sección:"));
+        panelForm.add(comboSeccion);
 
         // BOTONES
         JPanel panelBotones = new JPanel(new FlowLayout());
@@ -101,7 +115,7 @@ public class AlumnoVista extends JPanel {
 
         // BÚSQUEDA
         JPanel panelBuscar = new JPanel(new FlowLayout(
-            FlowLayout.LEFT
+                FlowLayout.LEFT
         ));
         panelBuscar.add(new JLabel("Buscar:"));
         panelBuscar.add(txtBuscar);
@@ -115,7 +129,7 @@ public class AlumnoVista extends JPanel {
         // TABLA CON SCROLL
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder(
-            "Lista de Alumnos"
+                "Lista de Alumnos"
         ));
 
         // PANEL INFERIOR
@@ -129,32 +143,49 @@ public class AlumnoVista extends JPanel {
 
     // ── EVENTOS ───────────────────────────────────
     private void initEventos() {
+        comboNivel.addActionListener(e -> cargarGrados());
 
-        // GUARDAR — registra nuevo alumno
+        //verificar si el DNI existe antes de registrar
+        if (controlador.buscarPorDni(txtDni.getText().trim()) != null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ya existe un alumno con ese DNI.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+
+            return;
+        }
+
+        
+    // GUARDAR — registra nuevo alumno
         btnGuardar.addActionListener(e -> {
-            if (!validarCampos()) return;
+            if (!validarCampos()) {
+                return;
+            }
 
             Alumno alumno = new Alumno(
-                0,
-                txtNombre.getText().trim(),
-                txtApellidos.getText().trim(),
-                txtDni.getText().trim(),
-                txtEmail.getText().trim(),
-                txtTelefono.getText().trim(),
-                txtDireccion.getText().trim(),
-                new Date(),
-                txtGrado.getText().trim(),
-                (String) comboNivel.getSelectedItem(),
-                new Date()
+                    0,
+                    txtNombre.getText().trim(),
+                    txtApellidos.getText().trim(),
+                    txtDni.getText().trim(),
+                    txtEmail.getText().trim(),
+                    txtTelefono.getText().trim(),
+                    txtDireccion.getText().trim(),
+                    new Date(),
+                    comboNivel.getSelectedItem().toString(),
+                    comboGrado.getSelectedItem().toString(),
+                    comboSeccion.getSelectedItem().toString(),
+                    new Date()
             );
 
             controlador.registrarAlumno(alumno);
             actualizarTabla(controlador.listarTodos());
             limpiarCampos();
             JOptionPane.showMessageDialog(this,
-                "Alumno registrado: " + alumno.getCodigoAlumno(),
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE
+                    "Alumno registrado: " + alumno.getCodigoAlumno(),
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
             );
         });
 
@@ -163,15 +194,15 @@ public class AlumnoVista extends JPanel {
             int fila = tabla.getSelectedRow();
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this,
-                    "Selecciona un alumno de la tabla.",
-                    "Aviso", JOptionPane.WARNING_MESSAGE
+                        "Selecciona un alumno de la tabla.",
+                        "Aviso", JOptionPane.WARNING_MESSAGE
                 );
                 return;
             }
             String codigo = (String) modeloTabla.getValueAt(fila, 0);
             int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Eliminar al alumno " + codigo + "?",
-                "Confirmar", JOptionPane.YES_NO_OPTION
+                    "¿Eliminar al alumno " + codigo + "?",
+                    "Confirmar", JOptionPane.YES_NO_OPTION
             );
             if (confirm == JOptionPane.YES_OPTION) {
                 controlador.eliminarAlumno(codigo);
@@ -184,30 +215,37 @@ public class AlumnoVista extends JPanel {
         btnActualizar.addActionListener(e -> {
             if (codigoSeleccionado == null) {
                 JOptionPane.showMessageDialog(this,
-                    "Selecciona un alumno de la tabla primero.",
-                    "Aviso", JOptionPane.WARNING_MESSAGE
+                        "Selecciona un alumno de la tabla primero.",
+                        "Aviso", JOptionPane.WARNING_MESSAGE
                 );
                 return;
             }
-            if (!validarCampos()) return;
+            if (!validarCampos()) {
+                return;
+            }
 
             // busca el alumno original para mantener su código
             Alumno original = controlador
-                .buscarPorCodigo(codigoSeleccionado);
-            if (original == null) return;
+                    .buscarPorCodigo(codigoSeleccionado);
+            if (original == null) {
+                return;
+            }
 
             // actualiza sus datos
-            original.setGrado(txtGrado.getText().trim());
             original.setNivel(
-                (String) comboNivel.getSelectedItem()
+                    (String) comboNivel.getSelectedItem()
+            );
+            original.setGrado((String) comboGrado.getSelectedItem());
+            original.setSeccion(
+                    (String) comboSeccion.getSelectedItem()
             );
 
             controlador.actualizarAlumno(original);
             actualizarTabla(controlador.listarTodos());
             limpiarCampos();
             JOptionPane.showMessageDialog(this,
-                "Alumno actualizado correctamente.",
-                "Éxito", JOptionPane.INFORMATION_MESSAGE
+                    "Alumno actualizado correctamente.",
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE
             );
         });
 
@@ -221,7 +259,7 @@ public class AlumnoVista extends JPanel {
                 actualizarTabla(controlador.listarTodos());
             } else {
                 actualizarTabla(
-                    controlador.buscarPorNombre(texto)
+                        controlador.buscarPorNombre(texto)
                 );
             }
         });
@@ -231,15 +269,17 @@ public class AlumnoVista extends JPanel {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int fila = tabla.getSelectedRow();
-                if (fila == -1) return;
+                if (fila == -1) {
+                    return;
+                }
 
                 // guarda el código del alumno seleccionado
                 codigoSeleccionado = (String) modeloTabla
-                    .getValueAt(fila, 0);
+                        .getValueAt(fila, 0);
 
                 // busca el alumno y carga sus datos en el form
                 Alumno a = controlador
-                    .buscarPorCodigo(codigoSeleccionado);
+                        .buscarPorCodigo(codigoSeleccionado);
                 if (a != null) {
                     txtNombre.setText(a.getNombre());
                     txtApellidos.setText(a.getApellidos());
@@ -247,8 +287,9 @@ public class AlumnoVista extends JPanel {
                     txtEmail.setText(a.getEmail());
                     txtTelefono.setText(a.getTelefono());
                     txtDireccion.setText(a.getDireccion());
-                    txtGrado.setText(a.getGrado());
                     comboNivel.setSelectedItem(a.getNivel());
+                    comboGrado.setSelectedItem(a.getGrado());
+                    comboSeccion.setSelectedItem(a.getSeccion());
                 }
             }
         });
@@ -258,29 +299,29 @@ public class AlumnoVista extends JPanel {
     private boolean validarCampos() {
         if (txtNombre.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "El nombre es obligatorio.",
-                "Error", JOptionPane.ERROR_MESSAGE
+                    "El nombre es obligatorio.",
+                    "Error", JOptionPane.ERROR_MESSAGE
             );
             return false;
         }
         if (txtApellidos.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "Los apellidos son obligatorios.",
-                "Error", JOptionPane.ERROR_MESSAGE
+                    "Los apellidos son obligatorios.",
+                    "Error", JOptionPane.ERROR_MESSAGE
             );
             return false;
         }
         if (txtDni.getText().trim().length() != 8) {
             JOptionPane.showMessageDialog(this,
-                "El DNI debe tener 8 dígitos.",
-                "Error", JOptionPane.ERROR_MESSAGE
+                    "El DNI debe tener 8 dígitos.",
+                    "Error", JOptionPane.ERROR_MESSAGE
             );
             return false;
         }
-        if (txtGrado.getText().trim().isEmpty()) {
+        if (comboGrado.getSelectedItem() == null || comboGrado.getSelectedItem().toString().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "El grado es obligatorio.",
-                "Error", JOptionPane.ERROR_MESSAGE
+                    "El grado es obligatorio.",
+                    "Error", JOptionPane.ERROR_MESSAGE
             );
             return false;
         }
@@ -296,8 +337,9 @@ public class AlumnoVista extends JPanel {
                 a.getNombre(),
                 a.getApellidos(),
                 a.getDni(),
-                a.getGrado(),
                 a.getNivel(),
+                a.getGrado(),
+                a.getSeccion(),
                 a.isEstadoActivo() ? "Activo" : "Inactivo"
             });
         }
@@ -311,9 +353,33 @@ public class AlumnoVista extends JPanel {
         txtEmail.setText("");
         txtTelefono.setText("");
         txtDireccion.setText("");
-        txtGrado.setText("");
         comboNivel.setSelectedIndex(0);
+        comboGrado.setSelectedIndex(0);
+        comboSeccion.setSelectedIndex(0);
         codigoSeleccionado = null;
         tabla.clearSelection();
+    }
+
+    private void cargarGrados() {
+        comboGrado.removeAllItems();
+        comboGrado.addItem("Seleccione un grado");
+
+        String nivel = comboNivel.getSelectedItem().toString();
+
+        if (nivel.equals("Primaria")) {
+
+            for (String grado : gradosPrimaria) {
+                comboGrado.addItem(grado);
+            }
+
+        } else {
+
+            for (String grado : gradosSecundaria) {
+                comboGrado.addItem(grado);
+            }
+
+        }
+
+        comboGrado.setSelectedIndex(0);
     }
 }

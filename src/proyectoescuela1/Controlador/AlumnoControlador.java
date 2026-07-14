@@ -22,14 +22,13 @@ public class AlumnoControlador {
     // ══════════════════════════════════════════════
     //  CRUD BÁSICO
     // ══════════════════════════════════════════════
-
     // Registra un alumno y guarda en archivo
     public void registrarAlumno(Alumno alumno) {
         alumnos.add(alumno);
         guardarDatos(); // serialización automática
-        System.out.println("Alumno registrado: " +
-                alumno.getCodigoAlumno() + " - " +
-                alumno.getNombreCompleto());
+        System.out.println("Alumno registrado: "
+                + alumno.getCodigoAlumno() + " - "
+                + alumno.getNombreCompleto());
     }
 
     // Elimina usando Iterator — forma segura de eliminar
@@ -55,8 +54,8 @@ public class AlumnoControlador {
                     .equals(alumno.getCodigoAlumno())) {
                 alumnos.set(i, alumno);
                 guardarDatos();
-                System.out.println("Alumno actualizado: " +
-                        alumno.getCodigoAlumno());
+                System.out.println("Alumno actualizado: "
+                        + alumno.getCodigoAlumno());
                 return;
             }
         }
@@ -66,7 +65,6 @@ public class AlumnoControlador {
     // ══════════════════════════════════════════════
     //  BÚSQUEDAS
     // ══════════════════════════════════════════════
-
     // Retorna todos los alumnos
     public List<Alumno> listarTodos() {
         return alumnos;
@@ -92,8 +90,8 @@ public class AlumnoControlador {
     public List<Alumno> buscarPorNombre(String nombre) {
         return alumnos.stream()
                 .filter(a -> a.getNombreCompleto()
-                        .toLowerCase()
-                        .contains(nombre.toLowerCase()))
+                .toLowerCase()
+                .contains(nombre.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -114,7 +112,6 @@ public class AlumnoControlador {
     // ══════════════════════════════════════════════
     //  MÉTODOS DE NOTAS — Lambda
     // ══════════════════════════════════════════════
-
     // Agrega nota a un alumno
     public void agregarNota(String codigoAlumno, Nota nota) {
         Alumno alumno = buscarPorCodigo(codigoAlumno);
@@ -124,7 +121,8 @@ public class AlumnoControlador {
             System.out.println("Nota agregada: " + codigoAlumno);
         }
     }
-/*
+
+    /*
     // Calcula promedio general usando Lambda mapToDouble
     public double calcularPromedioGeneral(String codigoAlumno) {
         Alumno alumno = buscarPorCodigo(codigoAlumno);
@@ -180,7 +178,7 @@ public class AlumnoControlador {
                         .compareTo(b.getApellidos()))
                 .collect(Collectors.toList());
     }
-*/
+     */
     // ══════════════════════════════════════════════
     //  ESTADÍSTICAS
     // ══════════════════════════════════════════════
@@ -204,8 +202,8 @@ public class AlumnoControlador {
             Alumno a = it.next();
             if (!a.isEstadoActivo()) {
                 it.remove();
-                System.out.println("Inactivo eliminado: " +
-                        a.getCodigoAlumno());
+                System.out.println("Inactivo eliminado: "
+                        + a.getCodigoAlumno());
             }
         }
         guardarDatos();
@@ -214,7 +212,6 @@ public class AlumnoControlador {
     // ══════════════════════════════════════════════
     //  SERIALIZACIÓN — guardar y cargar datos
     // ══════════════════════════════════════════════
-
     // Guarda la lista en archivo .dat (serialización)
     public void guardarDatos() {
         try (ObjectOutputStream out = new ObjectOutputStream(
@@ -237,10 +234,20 @@ public class AlumnoControlador {
         try (ObjectInputStream in = new ObjectInputStream(
                 new FileInputStream(ARCHIVO))) {
             alumnos = (List<Alumno>) in.readObject();
-            System.out.println("Datos cargados: " +
-                    alumnos.size() + " alumnos.");
+            System.out.println("Datos cargados: "
+                    + alumnos.size() + " alumnos.");
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error al cargar: " + e.getMessage());
         }
+    }
+
+    public List<Alumno> buscarPorGradoSeccion(String grado,
+            String seccion) {
+
+        return alumnos.stream()
+                .filter(a
+                        -> a.getGrado().equalsIgnoreCase(grado)
+                && a.getSeccion().equalsIgnoreCase(seccion))
+                .collect(Collectors.toList());
     }
 }
