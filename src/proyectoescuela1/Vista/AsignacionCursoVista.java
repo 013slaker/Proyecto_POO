@@ -277,7 +277,7 @@ public class AsignacionCursoVista extends JPanel {
                 + " (" + a.getNivel() + ")",
                 true
         );
-        dialog.setSize(700, 550);
+        dialog.setSize(900, 600);
         dialog.setLocationRelativeTo(padre);
         dialog.setLayout(new BorderLayout(10, 10));
 

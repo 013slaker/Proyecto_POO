@@ -331,6 +331,20 @@ public class DatosPrueba {
                 "B",
                 new Date()
         ));
+        alumnoCtrl.registrarAlumno(new Alumno(
+                8,
+                "Luna",
+                "Aldave Palomino",
+                "74890123",
+                "lunaaldave@gmail.com",
+                "987100008",
+                "Calle 23 Prado",
+                new Date(),
+                "Primaria",
+                "1",
+                "A",
+                new Date()
+        ));
 
         System.out.println("✓ "
                 + alumnoCtrl.totalAlumnos()
@@ -366,6 +380,12 @@ public class DatosPrueba {
                 "40456789", "maria@gmail.com",
                 "987200004", "Calle Real 400",
                 new Date(), "Madre", "Enfermera"
+        );
+        Apoderado apo6 = new Apoderado(
+                4, "Sofia", "Palomino Carrion",
+                "100606762", "palomino@gmail.com",
+                "999201104", "Calle 23 Prado",
+                new Date(), "Madre", "Doctora"
         );
 
         // asocia alumnos a apoderados
