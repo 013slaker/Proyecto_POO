@@ -122,7 +122,7 @@ public class AlumnoControlador {
         }
     }
 
-    /*
+    
     // Calcula promedio general usando Lambda mapToDouble
     public double calcularPromedioGeneral(String codigoAlumno) {
         Alumno alumno = buscarPorCodigo(codigoAlumno);
@@ -178,7 +178,7 @@ public class AlumnoControlador {
                         .compareTo(b.getApellidos()))
                 .collect(Collectors.toList());
     }
-     */
+     
     // ══════════════════════════════════════════════
     //  ESTADÍSTICAS
     // ══════════════════════════════════════════════

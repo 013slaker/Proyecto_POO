@@ -145,22 +145,22 @@ public class AlumnoVista extends JPanel {
     private void initEventos() {
         comboNivel.addActionListener(e -> cargarGrados());
 
-        //verificar si el DNI existe antes de registrar
-        if (controlador.buscarPorDni(txtDni.getText().trim()) != null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Ya existe un alumno con ese DNI.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        
-    // GUARDAR — registra nuevo alumno
+        // GUARDAR — registra nuevo alumno
         btnGuardar.addActionListener(e -> {
+
             if (!validarCampos()) {
+                return;
+            }
+
+            // Verificar DNI repetido
+            if (controlador.buscarPorDni(txtDni.getText().trim()) != null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ya existe un alumno registrado con ese DNI.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+
                 return;
             }
 
@@ -180,13 +180,13 @@ public class AlumnoVista extends JPanel {
             );
 
             controlador.registrarAlumno(alumno);
+
             actualizarTabla(controlador.listarTodos());
+
             limpiarCampos();
+
             JOptionPane.showMessageDialog(this,
-                    "Alumno registrado: " + alumno.getCodigoAlumno(),
-                    "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+                    "Alumno registrado correctamente.");
         });
 
         // ELIMINAR — elimina alumno seleccionado en tabla
