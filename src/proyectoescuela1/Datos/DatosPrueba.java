@@ -4,8 +4,11 @@
  */
 package proyectoescuela1.Datos;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import proyectoescuela1.Controlador.*;
 import proyectoescuela1.Modelo.*;
 
@@ -32,8 +35,11 @@ public class DatosPrueba {
             = new AsignacionCursoControlador();
     private NotaControlador notaCtrl
             = new NotaControlador();
-    private AsistenciaControlador asisCtrl
-            = new AsistenciaControlador();
+    // RegistroAsistenciaControlador es ahora la ÚNICA fuente de datos
+    // de asistencia (ver el nuevo AsistenciaControlador, que ya no
+    // guarda nada por su cuenta y solo consulta estos registros).
+    private RegistroAsistenciaControlador regAsisCtrl
+            = new RegistroAsistenciaControlador();
 
     // ── MÉTODO PRINCIPAL ──────────────────────────
     /**
@@ -458,31 +464,64 @@ public class DatosPrueba {
     private void cargarAsistencias() {
         System.out.println("Cargando asistencias...");
 
-        List<Alumno> alumnos
-                = alumnoCtrl.listarTodos();
+        List<Alumno> alumnos = alumnoCtrl.listarTodos();
 
-        // Lambda — carga asistencias para cada alumno
-        alumnos.forEach(a -> {
-            String codigo = a.getCodigoAlumno();
+        // Agrupa a los alumnos por sección (nivel + grado + sección),
+        // porque un RegistroAsistencia representa la asistencia de
+        // TODA una sección en un curso y una fecha determinados
+        // (igual que hace el docente al pasar lista por RegistroAsistenciaVista).
+        Map<String, List<Alumno>> porSeccion = alumnos.stream()
+                .collect(Collectors.groupingBy(
+                        a -> a.getNivel() + "|" + a.getGrado() + "|" + a.getSeccion()
+                ));
 
-            // semana de prueba
-            asisCtrl.registrar(new Asistencia(
-                    new Date(), "P", codigo, ""
-            ));
-            asisCtrl.registrar(new Asistencia(
-                    new Date(), "P", codigo, ""
-            ));
-            asisCtrl.registrar(new Asistencia(
-                    new Date(), "T", codigo,
-                    "Llegó 10 min tarde"
-            ));
-            asisCtrl.registrar(new Asistencia(
-                    new Date(), "F", codigo, ""
-            ));
-            asisCtrl.registrar(new Asistencia(
-                    new Date(), "J", codigo,
-                    "Certificado médico"
-            ));
+        // Patrón de estados para simular una semana de prueba
+        String[] patronEstados = {"P", "P", "T", "F", "J"};
+        String[] patronObservaciones = {
+            "", "", "Llegó 10 min tarde", "", "Certificado médico"
+        };
+
+        porSeccion.forEach((clave, listaAlumnos) -> {
+
+            String[] partes = clave.split("\\|");
+            String nivel = partes[0];
+            String grado = partes[1];
+            String seccion = partes[2];
+
+            // Elige un curso y un docente representativos de ese nivel
+            // para poder armar el RegistroAsistencia de prueba.
+            List<Curso> cursosNivel = cursoCtrl.buscarPorNivel(nivel);
+            List<Docente> docentesNivel = docenteCtrl.buscarPorNivel(nivel);
+
+            if (cursosNivel.isEmpty() || docentesNivel.isEmpty()) {
+                return; // no hay datos suficientes para esta sección
+            }
+
+            Curso curso = cursosNivel.get(0);
+            Docente docente = docentesNivel.get(0);
+
+            // Crea un RegistroAsistencia por cada día de la semana de prueba
+            for (int dia = 0; dia < patronEstados.length; dia++) {
+
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_MONTH, -dia);
+                Date fecha = cal.getTime();
+
+                RegistroAsistencia registro = new RegistroAsistencia(
+                        fecha, curso.getIdCurso(), curso.getNombre(),
+                        nivel, grado, seccion,
+                        docente.getCodigoDocente(), docente.getNombreCompleto()
+                );
+
+                for (Alumno a : listaAlumnos) {
+                    registro.agregarAsistencia(new Asistencia(
+                            fecha, patronEstados[dia],
+                            a.getCodigoAlumno(), patronObservaciones[dia]
+                    ));
+                }
+
+                regAsisCtrl.registrar(registro);
+            }
         });
 
         System.out.println("✓ Asistencias cargadas.");

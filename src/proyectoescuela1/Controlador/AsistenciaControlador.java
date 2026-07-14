@@ -4,106 +4,85 @@
  */
 package proyectoescuela1.Controlador;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import proyectoescuela1.Modelo.Alumno;
 import proyectoescuela1.Modelo.Asistencia;
+import proyectoescuela1.Modelo.RegistroAsistencia;
 
 /**
- * Controlador del módulo Asistencia.
- * Maneja registro, búsqueda con Lambda,
- * estadísticas y serialización.
+ * Controlador del módulo Asistencia — VISTA INDIVIDUAL POR ALUMNO.
+ *
+ * ── CAMBIO IMPORTANTE DE ARQUITECTURA ──────────────────────────────
+ * Antes esta clase guardaba SU PROPIA lista de Asistencia en un archivo
+ * separado ("asistencias.dat"), mientras que RegistroAsistenciaControlador
+ * guardaba OTRA lista distinta ("registroAsistencia.dat"). Eran dos
+ * "bases de datos" separadas para el mismo tipo de información, y por
+ * eso el historial no coincidía entre pantallas: lo que el docente
+ * registraba por lista (RegistroAsistenciaVista) no aparecía en la
+ * ficha individual del alumno (AsistenciaVista), y viceversa.
+ *
+ * Ahora AsistenciaControlador YA NO GUARDA NADA POR SU CUENTA.
+ * Solo consulta y edita las Asistencias que ya existen dentro de los
+ * RegistroAsistencia creados al pasar lista (RegistroAsistenciaVista).
+ * Así queda UNA SOLA fuente de verdad: RegistroAsistenciaControlador
+ * (archivo registroAsistencia.dat).
+ *
+ * Esta clase actúa como una "fachada" (facade): simplifica el acceso
+ * a los datos para la pantalla de ficha individual del alumno, sin
+ * duplicar el almacenamiento.
  */
 public class AsistenciaControlador {
 
-    /** Lista de todas las asistencias */
-    private List<Asistencia> asistencias = new ArrayList<>();
+    /** Controlador que realmente guarda los datos (única fuente de verdad). */
+    private RegistroAsistenciaControlador registroCtrl;
 
-    /** Archivo de persistencia */
-    private static final String ARCHIVO = "asistencias.dat";
-
-    /** Controlador de alumnos */
-    private AlumnoControlador alumnoControlador =
-            new AlumnoControlador();
-
-    // ── CONSTRUCTOR ───────────────────────────────
+    // ── CONSTRUCTORES ─────────────────────────────
+    /** Crea su propio RegistroAsistenciaControlador (carga registroAsistencia.dat). */
     public AsistenciaControlador() {
-        cargarDatos();
+        this.registroCtrl = new RegistroAsistenciaControlador();
+    }
+
+    /**
+     * Reutiliza un RegistroAsistenciaControlador ya existente (por ejemplo,
+     * el mismo que usa RegistroAsistenciaVista). Así se evita abrir y leer
+     * el archivo .dat más de una vez y ambas pantallas ven siempre los
+     * mismos datos actualizados.
+     */
+    public AsistenciaControlador(RegistroAsistenciaControlador registroCtrl) {
+        this.registroCtrl = registroCtrl;
     }
 
     // ══════════════════════════════════════════════
-    //  CRUD
+    //  UTILIDAD INTERNA
     // ══════════════════════════════════════════════
 
     /**
-     * Registra una asistencia y la agrega
-     * al alumno correspondiente.
+     * "Aplana" todos los registros de asistencia (uno por sección/curso/
+     * fecha) en una sola lista con TODAS las Asistencias individuales.
+     * Lambda: flatMap
      */
-    public void registrar(Asistencia asistencia) {
-        asistencias.add(asistencia);
-
-        // también la agrega al alumno directamente
-        Alumno alumno = alumnoControlador
-            .buscarPorCodigo(asistencia.getCodigoAlumno());
-        if (alumno != null) {
-            alumno.getAsistencias().add(asistencia);
-            alumnoControlador.guardarDatos();
-        }
-
-        guardarDatos();
-        System.out.println("Asistencia registrada: " +
-                asistencia.getIdAsistencia());
-    }
-
-    /**
-     * Retorna todas las asistencias.
-     */
-    public List<Asistencia> listar() {
-        return asistencias;
-    }
-
-    /**
-     * Elimina una asistencia usando Iterator.
-     */
-    public void eliminar(String idAsistencia) {
-        Iterator<Asistencia> it = asistencias.iterator();
-        while (it.hasNext()) {
-            Asistencia a = it.next();
-            if (a.getIdAsistencia().equals(idAsistencia)) {
-                it.remove();
-                guardarDatos();
-                return;
-            }
-        }
+    private List<Asistencia> todasLasAsistencias() {
+        return registroCtrl.listar().stream()
+                .flatMap(r -> r.getListaAsistencias().stream())
+                .collect(Collectors.toList());
     }
 
     // ══════════════════════════════════════════════
     //  BÚSQUEDAS — Lambda
     // ══════════════════════════════════════════════
 
-    /**
-     * Retorna todas las asistencias de un alumno.
-     * Lambda: filter por código
-     */
-    public List<Asistencia> buscarPorAlumno(
-            String codigo) {
-        return asistencias.stream()
-                .filter(a -> a.getCodigoAlumno()
-                        .equals(codigo))
+    /** Retorna todas las asistencias de un alumno (su historial completo). */
+    public List<Asistencia> buscarPorAlumno(String codigo) {
+        return todasLasAsistencias().stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Filtra por estado (P, T, F, J).
-     * Lambda: filter por estado
-     */
-    public List<Asistencia> buscarPorEstado(
-            String codigo, String estado) {
-        return asistencias.stream()
-                .filter(a -> a.getCodigoAlumno()
-                        .equals(codigo) &&
-                        a.getEstado().equals(estado))
+    /** Filtra el historial de un alumno por estado (P, T, F, J). */
+    public List<Asistencia> buscarPorEstado(String codigo, String estado) {
+        return todasLasAsistencias().stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo)
+                        && a.getEstado().equals(estado))
                 .collect(Collectors.toList());
     }
 
@@ -111,72 +90,69 @@ public class AsistenciaControlador {
     //  ESTADÍSTICAS — Lambda
     // ══════════════════════════════════════════════
 
-    /**
-     * Cuenta las faltas de un alumno.
-     * Lambda: filter + count
-     */
+    /** Cuenta las faltas (incluye tardanzas) de un alumno. */
     public long contarFaltas(String codigo) {
-        return asistencias.stream()
-                .filter(a -> a.getCodigoAlumno()
-                        .equals(codigo) &&
-                        a.esFalta())
+        return todasLasAsistencias().stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo) && a.esFalta())
                 .count();
     }
 
-    /**
-     * Cuenta las presencias de un alumno.
-     */
+    /** Cuenta las presencias de un alumno. */
     public long contarPresencias(String codigo) {
-        return asistencias.stream()
-                .filter(a -> a.getCodigoAlumno()
-                        .equals(codigo) &&
-                        a.esPresente())
+        return todasLasAsistencias().stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo) && a.esPresente())
                 .count();
     }
 
-    /**
-     * Calcula el porcentaje de asistencia.
-     * Lambda: count para presencias y total
-     */
+    /** Calcula el porcentaje de asistencia de un alumno. */
     public double porcentajeAsistencia(String codigo) {
-        long total = asistencias.stream()
-                .filter(a -> a.getCodigoAlumno()
-                        .equals(codigo))
+        long total = todasLasAsistencias().stream()
+                .filter(a -> a.getCodigoAlumno().equals(codigo))
                 .count();
         if (total == 0) return 0.0;
-        long presentes = contarPresencias(codigo);
-        return (presentes * 100.0) / total;
+        return (contarPresencias(codigo) * 100.0) / total;
     }
 
     // ══════════════════════════════════════════════
-    //  SERIALIZACIÓN
+    //  EDICIÓN — justificar una falta / anotar observación
     // ══════════════════════════════════════════════
 
-    /** Guarda la lista en archivo .dat */
-    public void guardarDatos() {
-        try (ObjectOutputStream out =
-                new ObjectOutputStream(
-                        new FileOutputStream(ARCHIVO))) {
-            out.writeObject(asistencias);
-        } catch (IOException e) {
-            System.out.println("Error al guardar: " +
-                    e.getMessage());
+    /**
+     * Busca la Asistencia por su id (dentro de todos los registros) y la
+     * marca como Justificada, agregando la observación indicada
+     * (ej. "Certificado médico"). Devuelve true si la encontró y actualizó.
+     *
+     * Esto reemplaza la vieja lógica de "crear una asistencia nueva":
+     * ahora se EDITA el registro que el docente ya tomó por lista.
+     */
+    public boolean justificar(String idAsistencia, String observacion) {
+        for (RegistroAsistencia r : registroCtrl.listar()) {
+            for (Asistencia a : r.getListaAsistencias()) {
+                if (a.getIdAsistencia().equals(idAsistencia)) {
+                    a.setEstado("J");
+                    a.setObservacion(observacion);
+                    registroCtrl.actualizar(r); // vuelve a guardar en disco
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
-    /** Carga la lista desde archivo .dat */
-    @SuppressWarnings("unchecked")
-    public void cargarDatos() {
-        File archivo = new File(ARCHIVO);
-        if (!archivo.exists()) return;
-        try (ObjectInputStream in =
-                new ObjectInputStream(
-                        new FileInputStream(ARCHIVO))) {
-            asistencias =
-                (List<Asistencia>) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error al cargar: " +
-                    e.getMessage());
+    /**
+     * Actualiza solo la observación de una Asistencia, sin cambiar su estado.
+     * Útil para anotar detalles sobre una anomalía sin necesidad de justificar.
+     */
+    public boolean actualizarObservacion(String idAsistencia, String observacion) {
+        for (RegistroAsistencia r : registroCtrl.listar()) {
+            for (Asistencia a : r.getListaAsistencias()) {
+                if (a.getIdAsistencia().equals(idAsistencia)) {
+                    a.setObservacion(observacion);
+                    registroCtrl.actualizar(r);
+                    return true;
+                }
+            }
         }
+        return false;
     }
 }

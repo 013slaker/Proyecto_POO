@@ -1,8 +1,15 @@
 package proyectoescuela1.Modelo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public abstract class Usuario {
+/**
+ * Usuario  implementa Serializable.
+ *
+ */
+public abstract class Usuario implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     protected int id;
     protected String nombre;
@@ -12,7 +19,10 @@ public abstract class Usuario {
     protected String telefono;
     protected String direccion;
     protected Date fechaNac;
-    
+
+
+    protected Usuario() {
+    }
 
     // Constructor
     public Usuario(int id, String nombre, String apellidos,

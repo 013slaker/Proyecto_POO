@@ -38,7 +38,7 @@ public class DocenteVista extends JPanel {
     // COMBOBOX
     //==================================================
     // El usuario elegirá uno de estos niveles
-    private String[] niveles = {"Inicial", "Primaria", "Secundaria"};
+    private String[] niveles = {"Primaria", "Secundaria"};
     private JComboBox<String> comboNivel = new JComboBox<>(niveles);
 
     //==================================================
