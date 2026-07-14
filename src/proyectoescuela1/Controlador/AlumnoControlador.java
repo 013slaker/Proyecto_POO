@@ -250,4 +250,22 @@ public class AlumnoControlador {
                 && a.getSeccion().equalsIgnoreCase(seccion))
                 .collect(Collectors.toList());
     }
+    
+    public List<Alumno> buscarPorSeccion(
+        String nivel,
+        String grado,
+        String seccion){
+    return alumnos.stream()
+
+            .filter(a->
+
+                    a.getNivel().equalsIgnoreCase(nivel)
+                    &&
+                    a.getGrado().equalsIgnoreCase(grado)
+                    &&
+                    a.getSeccion().equalsIgnoreCase(seccion)
+            )
+            .toList();
+
+}
 }

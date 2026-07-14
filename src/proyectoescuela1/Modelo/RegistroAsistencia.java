@@ -14,8 +14,8 @@ import java.util.List;
 /**
  * Registro de Asistencia.
  *
- * Representa el registro de asistencia realizado por un docente
- * para un curso, grado y sección en una fecha determinada.
+ * Representa el registro de asistencia realizado por un docente para un curso,
+ * grado y sección en una fecha determinada.
  *
  * Un RegistroAsistencia contiene muchas Asistencias.
  *
@@ -28,7 +28,6 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // GENERADOR DE CÓDIGO AUTOMÁTICO
     //==================================================
-
     private static int contador = 1;
 
     private static String generarCodigo() {
@@ -38,21 +37,14 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // ATRIBUTOS
     //==================================================
-
     private String codigoRegistro;
-
     private Date fecha;
-
     private String codigoCurso;
-
     private String nombreCurso;
-
+    private String nivel;
     private String grado;
-
     private String seccion;
-
     private String codigoDocente;
-
     private String nombreDocente;
 
     // Composición
@@ -61,11 +53,11 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // CONSTRUCTOR
     //==================================================
-
     public RegistroAsistencia(
             Date fecha,
             String codigoCurso,
             String nombreCurso,
+            String nivel,
             String grado,
             String seccion,
             String codigoDocente,
@@ -75,6 +67,7 @@ public class RegistroAsistencia implements Serializable {
         this.fecha = fecha;
         this.codigoCurso = codigoCurso;
         this.nombreCurso = nombreCurso;
+        this.nivel = nivel;
         this.grado = grado;
         this.seccion = seccion;
         this.codigoDocente = codigoDocente;
@@ -86,7 +79,6 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // MÉTODOS DE NEGOCIO
     //==================================================
-
     /**
      * Agrega una asistencia al registro.
      */
@@ -179,8 +171,9 @@ public class RegistroAsistencia implements Serializable {
      */
     public double porcentajeAsistencia() {
 
-        if (listaAsistencias.isEmpty())
+        if (listaAsistencias.isEmpty()) {
             return 0;
+        }
 
         return (totalPresentes() * 100.0)
                 / listaAsistencias.size();
@@ -192,8 +185,8 @@ public class RegistroAsistencia implements Serializable {
      */
     public String getFechaFormateada() {
 
-        SimpleDateFormat sdf =
-                new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf
+                = new SimpleDateFormat("dd/MM/yyyy");
 
         return sdf.format(fecha);
 
@@ -202,7 +195,6 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // GETTERS
     //==================================================
-
     public String getCodigoRegistro() {
         return codigoRegistro;
     }
@@ -217,6 +209,10 @@ public class RegistroAsistencia implements Serializable {
 
     public String getNombreCurso() {
         return nombreCurso;
+    }
+
+    public String getNivel() {
+        return nivel;
     }
 
     public String getGrado() {
@@ -242,7 +238,6 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // SETTERS
     //==================================================
-
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
@@ -253,6 +248,10 @@ public class RegistroAsistencia implements Serializable {
 
     public void setNombreCurso(String nombreCurso) {
         this.nombreCurso = nombreCurso;
+    }
+
+    public void setNivel(String nivel) {
+        this.nivel = nivel;
     }
 
     public void setGrado(String grado) {
@@ -274,19 +273,19 @@ public class RegistroAsistencia implements Serializable {
     //==================================================
     // TOSTRING
     //==================================================
-
     @Override
     public String toString() {
 
-        return "RegistroAsistencia{" +
-                "codigo='" + codigoRegistro + '\'' +
-                ", fecha=" + getFechaFormateada() +
-                ", curso='" + nombreCurso + '\'' +
-                ", grado='" + grado + '\'' +
-                ", seccion='" + seccion + '\'' +
-                ", docente='" + nombreDocente + '\'' +
-                ", alumnos=" + totalAlumnos() +
-                '}';
+        return "RegistroAsistencia{"
+                + "codigo='" + codigoRegistro + '\''
+                + ", fecha=" + getFechaFormateada()+'\''
+                + ", curso='" + nombreCurso + '\''
+                + ", nivel='" + nivel + '\''
+                + ", grado='" + grado + '\''
+                + ", seccion='" + seccion + '\''
+                + ", docente='" + nombreDocente + '\''
+                + ", alumnos=" + totalAlumnos()
+                + '}';
 
     }
 

@@ -13,27 +13,24 @@ import proyectoescuela1.Modelo.RegistroAsistencia;
 /**
  * Controlador del módulo Registro de Asistencia.
  *
- * Administra los registros diarios de asistencia,
- * búsquedas, estadísticas y persistencia mediante
- * serialización.
+ * Administra los registros diarios de asistencia, búsquedas, estadísticas y
+ * persistencia mediante serialización.
  */
 public class RegistroAsistenciaControlador {
 
     //====================================================
     // LISTA DE REGISTROS (Base de datos en memoria)
     //====================================================
-
-    private List<RegistroAsistencia> registros =
-            new ArrayList<>();
+    private List<RegistroAsistencia> registros
+            = new ArrayList<>();
 
     // Archivo de persistencia
-    private static final String ARCHIVO =
-            "registroAsistencia.dat";
+    private static final String ARCHIVO
+            = "registroAsistencia.dat";
 
     //====================================================
     // CONSTRUCTOR
     //====================================================
-
     public RegistroAsistenciaControlador() {
         cargarDatos();
     }
@@ -41,7 +38,6 @@ public class RegistroAsistenciaControlador {
     //====================================================
     // CRUD
     //====================================================
-
     /**
      * Registra un nuevo registro de asistencia.
      */
@@ -63,8 +59,8 @@ public class RegistroAsistenciaControlador {
      */
     public void eliminar(String codigoRegistro) {
 
-        Iterator<RegistroAsistencia> it =
-                registros.iterator();
+        Iterator<RegistroAsistencia> it
+                = registros.iterator();
 
         while (it.hasNext()) {
 
@@ -123,7 +119,6 @@ public class RegistroAsistenciaControlador {
     //====================================================
     // BÚSQUEDAS (LAMBDA)
     //====================================================
-
     /**
      * Buscar por código.
      */
@@ -131,13 +126,10 @@ public class RegistroAsistenciaControlador {
             String codigo) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getCodigoRegistro()
-                                .equals(codigo))
-
+                .filter(r
+                        -> r.getCodigoRegistro()
+                        .equals(codigo))
                 .findFirst()
-
                 .orElse(null);
 
     }
@@ -149,11 +141,9 @@ public class RegistroAsistenciaControlador {
             String codigoDocente) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getCodigoDocente()
-                                .equals(codigoDocente))
-
+                .filter(r
+                        -> r.getCodigoDocente()
+                        .equals(codigoDocente))
                 .collect(Collectors.toList());
 
     }
@@ -165,11 +155,9 @@ public class RegistroAsistenciaControlador {
             String codigoCurso) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getCodigoCurso()
-                                .equals(codigoCurso))
-
+                .filter(r
+                        -> r.getCodigoCurso()
+                        .equals(codigoCurso))
                 .collect(Collectors.toList());
 
     }
@@ -181,11 +169,9 @@ public class RegistroAsistenciaControlador {
             String grado) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getGrado()
-                                .equalsIgnoreCase(grado))
-
+                .filter(r
+                        -> r.getGrado()
+                        .equalsIgnoreCase(grado))
                 .collect(Collectors.toList());
 
     }
@@ -197,11 +183,9 @@ public class RegistroAsistenciaControlador {
             String seccion) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getSeccion()
-                                .equalsIgnoreCase(seccion))
-
+                .filter(r
+                        -> r.getSeccion()
+                        .equalsIgnoreCase(seccion))
                 .collect(Collectors.toList());
 
     }
@@ -213,10 +197,8 @@ public class RegistroAsistenciaControlador {
             Date fecha) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getFecha().equals(fecha))
-
+                .filter(r
+                        -> r.getFecha().equals(fecha))
                 .collect(Collectors.toList());
 
     }
@@ -224,7 +206,6 @@ public class RegistroAsistenciaControlador {
     //====================================================
     // ESTADÍSTICAS (LAMBDA)
     //====================================================
-
     /**
      * Total de registros.
      */
@@ -235,18 +216,15 @@ public class RegistroAsistenciaControlador {
     }
 
     /**
-     * Total de registros realizados
-     * por un docente.
+     * Total de registros realizados por un docente.
      */
     public long totalPorDocente(
             String codigoDocente) {
 
         return registros.stream()
-
-                .filter(r ->
-                        r.getCodigoDocente()
-                                .equals(codigoDocente))
-
+                .filter(r
+                        -> r.getCodigoDocente()
+                        .equals(codigoDocente))
                 .count();
 
     }
@@ -258,11 +236,86 @@ public class RegistroAsistenciaControlador {
             String codigoCurso) {
 
         return registros.stream()
+                .filter(r
+                        -> r.getCodigoCurso()
+                        .equals(codigoCurso))
+                .count();
 
-                .filter(r ->
-                        r.getCodigoCurso()
-                                .equals(codigoCurso))
+    }
 
+    /**
+     * Buscar registros por nivel.
+     */
+    public List<RegistroAsistencia> buscarPorNivel(String nivel) {
+
+        return registros.stream()
+                .filter(r -> r.getNivel().equalsIgnoreCase(nivel))
+                .collect(Collectors.toList());
+
+    }
+
+    /**
+     * Busca los registros de una sección específica.
+     */
+    public List<RegistroAsistencia> buscarPorSeccion(
+            String nivel,
+            String grado,
+            String seccion) {
+
+        return registros.stream()
+                .filter(r
+                        -> r.getNivel().equalsIgnoreCase(nivel)
+                && r.getGrado().equalsIgnoreCase(grado)
+                && r.getSeccion().equalsIgnoreCase(seccion))
+                .collect(Collectors.toList());
+
+    }
+
+    /**
+     * Busca un registro por curso y fecha.
+     */
+    public RegistroAsistencia buscarRegistro(
+            String codigoCurso,
+            Date fecha) {
+
+        return registros.stream()
+                .filter(r
+                        -> r.getCodigoCurso().equals(codigoCurso)
+                && r.getFecha().equals(fecha))
+                .findFirst()
+                .orElse(null);
+
+    }
+
+    /**
+     * Busca un registro de asistencia de una sección en una fecha determinada.
+     */
+    public RegistroAsistencia buscarRegistro(
+            Date fecha,
+            String codigoCurso,
+            String nivel,
+            String grado,
+            String seccion) {
+
+        return registros.stream()
+                .filter(r
+                        -> r.getFecha().equals(fecha)
+                && r.getCodigoCurso().equals(codigoCurso)
+                && r.getNivel().equalsIgnoreCase(nivel)
+                && r.getGrado().equalsIgnoreCase(grado)
+                && r.getSeccion().equalsIgnoreCase(seccion))
+                .findFirst()
+                .orElse(null);
+
+    }
+
+    /**
+     * Total de registros por nivel.
+     */
+    public long totalPorNivel(String nivel) {
+
+        return registros.stream()
+                .filter(r -> r.getNivel().equalsIgnoreCase(nivel))
                 .count();
 
     }
@@ -274,11 +327,26 @@ public class RegistroAsistenciaControlador {
             String grado) {
 
         return registros.stream()
+                .filter(r
+                        -> r.getGrado()
+                        .equalsIgnoreCase(grado))
+                .count();
 
-                .filter(r ->
-                        r.getGrado()
-                                .equalsIgnoreCase(grado))
+    }
 
+    /**
+     * Total de registros por sección.
+     */
+    public long totalPorSeccion(
+            String nivel,
+            String grado,
+            String seccion) {
+
+        return registros.stream()
+                .filter(r
+                        -> r.getNivel().equalsIgnoreCase(nivel)
+                && r.getGrado().equalsIgnoreCase(grado)
+                && r.getSeccion().equalsIgnoreCase(seccion))
                 .count();
 
     }
@@ -286,17 +354,15 @@ public class RegistroAsistenciaControlador {
     //====================================================
     // SERIALIZACIÓN
     //====================================================
-
     /**
-     * Guarda todos los registros
-     * en archivo .dat
+     * Guarda todos los registros en archivo .dat
      */
     public void guardarDatos() {
 
-        try (ObjectOutputStream out =
-                     new ObjectOutputStream(
-                             new FileOutputStream(
-                                     ARCHIVO))) {
+        try (ObjectOutputStream out
+                = new ObjectOutputStream(
+                        new FileOutputStream(
+                                ARCHIVO))) {
 
             out.writeObject(registros);
 
@@ -308,7 +374,7 @@ public class RegistroAsistenciaControlador {
 
             System.out.println(
                     "Error al guardar: "
-                            + e.getMessage()
+                    + e.getMessage()
             );
 
         }
@@ -321,8 +387,8 @@ public class RegistroAsistenciaControlador {
     @SuppressWarnings("unchecked")
     public void cargarDatos() {
 
-        File archivo =
-                new File(ARCHIVO);
+        File archivo
+                = new File(ARCHIVO);
 
         if (!archivo.exists()) {
 
@@ -334,26 +400,25 @@ public class RegistroAsistenciaControlador {
 
         }
 
-        try (ObjectInputStream in =
-                     new ObjectInputStream(
-                             new FileInputStream(
-                                     ARCHIVO))) {
+        try (ObjectInputStream in
+                = new ObjectInputStream(
+                        new FileInputStream(
+                                ARCHIVO))) {
 
-            registros =
-                    (List<RegistroAsistencia>)
-                            in.readObject();
+            registros
+                    = (List<RegistroAsistencia>) in.readObject();
 
             System.out.println(
                     registros.size()
-                            + " registros cargados."
+                    + " registros cargados."
             );
 
-        } catch (IOException |
-                 ClassNotFoundException e) {
+        } catch (IOException
+                | ClassNotFoundException e) {
 
             System.out.println(
                     "Error al cargar: "
-                            + e.getMessage()
+                    + e.getMessage()
             );
 
         }

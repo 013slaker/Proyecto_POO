@@ -251,7 +251,7 @@ public class MenuPrincipalVista extends JFrame {
         JButton btnAsistencia = new JButton("Asistencia");
         asignarImagenBoton(btnAsistencia, "/proyectoescuela1/iconos/asistencia.png", 40, 40);
         btnAsistencia.addActionListener(e -> {
-           mostrarPanel(new AsistenciaVista()); 
+           mostrarPanel(new RegistroAsistenciaVista()); 
         });
         
         JButton btnNotas = new JButton("Notas");
@@ -259,6 +259,13 @@ public class MenuPrincipalVista extends JFrame {
         btnNotas.addActionListener(e -> {
             mostrarPanel(new NotaVista());
         });
+        // En crearSubMenuAcademico()
+JButton btnAsignaciones =
+    new JButton("Asignación Cursos");
+btnAsignaciones.addActionListener(e -> {
+    mostrarPanel(new AsignacionCursoVista());
+});
+panel.add(btnAsignaciones);
 
         JButton btnLibretas = new JButton("Libretas de Notas");
 
