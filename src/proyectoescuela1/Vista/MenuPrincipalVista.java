@@ -144,6 +144,9 @@ public class MenuPrincipalVista extends JFrame {
 
         btnFinanciero = new JButton("Financiero");
         asignarImagenBoton(btnFinanciero, "/proyectoescuela1/iconos/financiero.png", 40, 40);
+        btnFinanciero.addActionListener(e -> {
+            mostrarPanel(crearSubMenuFinanciero());
+        });
 
         btnReportes = new JButton("Reportes");
         asignarImagenBoton(btnReportes, "/proyectoescuela1/iconos/reportes.png", 40, 40);
@@ -385,6 +388,55 @@ public class MenuPrincipalVista extends JFrame {
         panel.add(btnMatriculas);
         panel.add(btnCambioSeccion);
         panel.add(btnRetiro);
+
+        return panel;
+    }
+
+    // Modulo financiero
+    private JPanel crearSubMenuFinanciero() {
+        JPanel panel = new JPanel(new GridLayout(2, 4, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // -- Pensiones (configurar tarifa por nivel/grado) --
+        JButton btnPensiones = new JButton("Pensiones");
+        asignarImagenBoton(btnPensiones, "/proyectoescuela1/iconos/pension.png", 40, 40);
+        btnPensiones.setVerticalTextPosition(JButton.BOTTOM);
+        btnPensiones.setHorizontalTextPosition(JButton.CENTER);
+        btnPensiones.addActionListener(e -> {
+            mostrarPanel(new TarifaPensionVista());
+        });
+
+        // -- Pagos (registrar pago, ver deudas del alumno) --
+        JButton btnPagos = new JButton("Pagos");
+        asignarImagenBoton(btnPagos, "/proyectoescuela1/iconos/pagos.png", 50, 50);
+        btnPagos.setVerticalTextPosition(JButton.BOTTOM);
+        btnPagos.setHorizontalTextPosition(JButton.CENTER);
+        btnPagos.addActionListener(e -> {
+            mostrarPanel(new PagoVista());
+        });
+
+        // -- Deudas (cobranza general, se generan automáticamente) --
+        JButton btnDeudas = new JButton("Deudas");
+        asignarImagenBoton(btnDeudas, "/proyectoescuela1/iconos/deuda.png", 50, 50);
+        btnDeudas.setVerticalTextPosition(JButton.BOTTOM);
+        btnDeudas.setHorizontalTextPosition(JButton.CENTER);
+        btnDeudas.addActionListener(e -> {
+            mostrarPanel(new DeudaVista());
+        });
+
+        // -- Descuentos (becas, hermanos, convenios) --
+        JButton btnDescuentos = new JButton("Descuentos");
+        asignarImagenBoton(btnDescuentos, "/proyectoescuela1/iconos/descuento.png", 50, 50);
+        btnDescuentos.setVerticalTextPosition(JButton.BOTTOM);
+        btnDescuentos.setHorizontalTextPosition(JButton.CENTER);
+        btnDescuentos.addActionListener(e -> {
+            mostrarPanel(new DescuentoVista());
+        });
+
+        panel.add(btnPensiones);
+        panel.add(btnPagos);
+        panel.add(btnDeudas);
+        panel.add(btnDescuentos);
 
         return panel;
     }
