@@ -482,7 +482,16 @@ public class AsistenciaVista extends JPanel {
                 ));
             }
 
-            controlador.registrar(nuevo);
+            try {
+                controlador.registrar(nuevo);
+            } catch (IllegalStateException ex) {
+                // Se lanza cuando la fecha cae fuera del
+                // bimestre actualmente activo.
+                JOptionPane.showMessageDialog(this,
+                        ex.getMessage(),
+                        "Bimestre no disponible", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             registroActual = nuevo;
 
         } else {
@@ -502,7 +511,14 @@ public class AsistenciaVista extends JPanel {
                         });
             }
 
-            controlador.actualizar(registroActual);
+            try {
+                controlador.actualizar(registroActual);
+            } catch (IllegalStateException ex) {
+                JOptionPane.showMessageDialog(this,
+                        ex.getMessage(),
+                        "Bimestre no disponible", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
         }
 
         JOptionPane.showMessageDialog(this,

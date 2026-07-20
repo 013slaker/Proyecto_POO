@@ -40,6 +40,8 @@ public class DatosPrueba {
     // guarda nada por su cuenta y solo consulta estos registros).
     private AsistenciaControlador regAsisCtrl
             = new AsistenciaControlador();
+    private PeriodoControlador periodoCtrl
+            = new PeriodoControlador();
 
     // ── MÉTODO PRINCIPAL ──────────────────────────
     /**
@@ -64,6 +66,7 @@ public class DatosPrueba {
         cargarHorarios();
         cargarAlumnos();
         cargarApoderados();
+        cargarPeriodoAcademico();
         cargarNotas();
         cargarAsistencias();
 
@@ -434,6 +437,45 @@ public class DatosPrueba {
     }
 
     // ══════════════════════════════════════════════
+    //  PERÍODO ACADÉMICO (Año Escolar y Bimestres)
+    // ══════════════════════════════════════════════
+    /**
+     * Crea el Año Escolar de prueba con las fechas típicas
+     * de los 4 bimestres. NotaControlador y AsistenciaControlador
+     * ya no aceptan registros si el bimestre correspondiente
+     * no está activo, así que este paso es obligatorio antes
+     * de cargar notas o asistencias.
+     */
+    private void cargarPeriodoAcademico() {
+        System.out.println("Configurando período académico...");
+
+        Calendar cal = Calendar.getInstance();
+        int anio = cal.get(Calendar.YEAR);
+        periodoCtrl.crearAnioEscolar(anio);
+
+        periodoCtrl.definirFechasBimestre(1,
+                fecha(anio, Calendar.MARCH, 1),
+                fecha(anio, Calendar.MAY, 31));
+        periodoCtrl.definirFechasBimestre(2,
+                fecha(anio, Calendar.JUNE, 1),
+                fecha(anio, Calendar.AUGUST, 15));
+        periodoCtrl.definirFechasBimestre(3,
+                fecha(anio, Calendar.AUGUST, 16),
+                fecha(anio, Calendar.OCTOBER, 31));
+        periodoCtrl.definirFechasBimestre(4,
+                fecha(anio, Calendar.NOVEMBER, 1),
+                fecha(anio, Calendar.DECEMBER, 20));
+
+        System.out.println("✓ Período académico configurado.");
+    }
+
+    private Date fecha(int anio, int mes, int dia) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(anio, mes, dia, 0, 0, 0);
+        return cal.getTime();
+    }
+
+    // ══════════════════════════════════════════════
     //  NOTAS
     // ══════════════════════════════════════════════
     private void cargarNotas() {
@@ -442,13 +484,16 @@ public class DatosPrueba {
         List<Alumno> alumnos
                 = alumnoCtrl.listarTodos();
 
-        // Lambda — carga notas para cada alumno
+        // Se activa el Bimestre 1 y se registran solo las notas
+        // de ese bimestre, luego se avanza al Bimestre 2. Así se
+        // respeta la misma regla que seguiría un docente real:
+        // solo se puede registrar en el bimestre activo.
+        periodoCtrl.activarBimestre(1);
         alumnos.forEach(a -> {
             String codigo = a.getCodigoAlumno();
 
-            // Bimestre 1
             notaCtrl.registrar(new Nota(
-                    1, 15.0, "Parcial",
+                    1, 15.0, "Práctica 1",
                     "Matemática", codigo
             ));
             notaCtrl.registrar(new Nota(
@@ -456,17 +501,21 @@ public class DatosPrueba {
                     "Matemática", codigo
             ));
             notaCtrl.registrar(new Nota(
-                    1, 16.0, "Parcial",
+                    1, 16.0, "Práctica 1",
                     "Comunicación", codigo
             ));
             notaCtrl.registrar(new Nota(
                     1, 13.0, "Examen",
                     "Comunicación", codigo
             ));
+        });
 
-            // Bimestre 2
+        periodoCtrl.activarBimestre(2);
+        alumnos.forEach(a -> {
+            String codigo = a.getCodigoAlumno();
+
             notaCtrl.registrar(new Nota(
-                    2, 17.0, "Parcial",
+                    2, 17.0, "Práctica 1",
                     "Matemática", codigo
             ));
             notaCtrl.registrar(new Nota(
@@ -483,6 +532,18 @@ public class DatosPrueba {
     // ══════════════════════════════════════════════
     private void cargarAsistencias() {
         System.out.println("Cargando asistencias...");
+
+        // Las asistencias de prueba usan fechas recientes (hoy y
+        // los días previos), así que se activa el bimestre que
+        // realmente contiene la fecha de hoy antes de registrar.
+        boolean activado = periodoCtrl.activarBimestreQueContiene(new Date());
+        if (!activado) {
+            System.out.println(
+                "Aviso: la fecha de hoy no cae en ningún bimestre " +
+                "configurado; se omite la carga de asistencias de prueba."
+            );
+            return;
+        }
 
         List<Alumno> alumnos = alumnoCtrl.listarTodos();
 

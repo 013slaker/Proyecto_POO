@@ -29,6 +29,10 @@ public class AsistenciaControlador {
     private static final String ARCHIVO
             = "registroAsistencia.dat";
 
+    /** Controlador de período académico: valida el bimestre activo */
+    private proyectoescuela1.Controlador.PeriodoControlador periodoControlador
+            = new proyectoescuela1.Controlador.PeriodoControlador();
+
     //====================================================
     // CONSTRUCTOR
     //====================================================
@@ -43,6 +47,10 @@ public class AsistenciaControlador {
      * Registra un nuevo registro de asistencia.
      */
     public void registrar(RegistroAsistencia registro) {
+
+        // No se permite registrar asistencia fuera del
+        // bimestre actualmente activo.
+        periodoControlador.validarFecha(registro.getFecha());
 
         registros.add(registro);
 
@@ -89,6 +97,8 @@ public class AsistenciaControlador {
      * Actualiza un registro existente.
      */
     public void actualizar(RegistroAsistencia registro) {
+
+        periodoControlador.validarFecha(registro.getFecha());
 
         for (int i = 0; i < registros.size(); i++) {
 

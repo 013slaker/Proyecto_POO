@@ -137,12 +137,20 @@ public class MenuPrincipalVista extends JFrame {
 
         btnAdministrativo = new JButton("Administrativo");
         asignarImagenBoton(btnAdministrativo, "/proyectoescuela1/iconos/administrativo.png", 40, 40);
+        btnAdministrativo.addActionListener(e -> {
+            System.out.println("CLICK MODULO ADMINISTRATIVO");
+            mostrarPanel(crearSubMenuAdministrativo());
+        });
 
         btnFinanciero = new JButton("Financiero");
         asignarImagenBoton(btnFinanciero, "/proyectoescuela1/iconos/financiero.png", 40, 40);
 
         btnReportes = new JButton("Reportes");
         asignarImagenBoton(btnReportes, "/proyectoescuela1/iconos/reportes.png", 40, 40);
+        btnReportes.addActionListener(e -> {
+            System.out.println("CLICK MODULO REPORTES");
+            mostrarPanel(crearSubMenuReportes());
+        });
 
         btnSalir = new JButton("Salir");
         asignarImagenBoton(btnSalir, "/proyectoescuela1/iconos/salir.png", 40, 40);
@@ -197,10 +205,30 @@ public class MenuPrincipalVista extends JFrame {
 
         panelInferior = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        panelInferior.add(new JLabel("Año escolar activo"));
+        panelInferior.add(new JLabel(obtenerTextoPeriodoActivo()));
 
         add(panelInferior, BorderLayout.SOUTH);
 
+    }
+
+    /**
+     * Consulta el bimestre activo real (Administrativo → Período
+     * Académico) para mostrarlo en la barra inferior.
+     */
+    private String obtenerTextoPeriodoActivo() {
+        proyectoescuela1.Controlador.PeriodoControlador periodoCtrl =
+                new proyectoescuela1.Controlador.PeriodoControlador();
+        proyectoescuela1.Modelo.AnioEscolar anio = periodoCtrl.getAnioEscolar();
+        proyectoescuela1.Modelo.Bimestre activo = periodoCtrl.getBimestreActivo();
+
+        if (anio == null) {
+            return "Año escolar: sin configurar (ir a Administrativo → Período Académico)";
+        }
+        if (activo == null) {
+            return "Año escolar " + anio.getAnio() + " — sin bimestre activo";
+        }
+        return "Año escolar " + anio.getAnio() +
+                " — Bimestre " + activo.getNumero() + " activo";
     }
 
     //metodos para llamar los paneles con los botones
@@ -219,6 +247,8 @@ public class MenuPrincipalVista extends JFrame {
 
         JButton btnAlumnos = new JButton("Gestión Alumnos");
         asignarImagenBoton(btnAlumnos, "/proyectoescuela1/iconos/alumno.png", 40, 40);
+        btnAlumnos.setVerticalTextPosition(JButton.BOTTOM);
+        btnAlumnos.setHorizontalTextPosition(JButton.CENTER);
         btnAlumnos.addActionListener(e -> {
             System.out.println("CLICK ALUMNOS");
             mostrarPanel(new AlumnoVista());
@@ -226,6 +256,8 @@ public class MenuPrincipalVista extends JFrame {
 
         JButton btnApoderado = new JButton("Gestión Apoderado");
         asignarImagenBoton(btnApoderado, "/proyectoescuela1/iconos/apoderado.png", 40, 40);
+        btnApoderado.setVerticalTextPosition(JButton.BOTTOM);
+        btnApoderado.setHorizontalTextPosition(JButton.CENTER);
         btnApoderado.addActionListener(e -> {
             System.out.println("CLICK apoderados");
             mostrarPanel(new ApoderadoVista());
@@ -233,42 +265,51 @@ public class MenuPrincipalVista extends JFrame {
 
         JButton btnDocentes = new JButton("Gestión Docentes");
         asignarImagenBoton(btnDocentes, "/proyectoescuela1/iconos/docente.png", 40, 40);
+        btnDocentes.setVerticalTextPosition(JButton.BOTTOM);
+        btnDocentes.setHorizontalTextPosition(JButton.CENTER);
         btnDocentes.addActionListener(e -> {
             mostrarPanel(new DocenteVista());
         });
 
         JButton btnCursos = new JButton("Cursos");
         asignarImagenBoton(btnCursos, "/proyectoescuela1/iconos/cursos.png", 40, 40);
+        btnCursos.setVerticalTextPosition(JButton.BOTTOM);
+        btnCursos.setHorizontalTextPosition(JButton.CENTER);
         btnCursos.addActionListener(e -> {
             mostrarPanel(new CursoVista());
         });
 
         JButton btnHorarios = new JButton("Horarios");
         asignarImagenBoton(btnHorarios, "/proyectoescuela1/iconos/horario.png", 40, 40);
+        btnHorarios.setVerticalTextPosition(JButton.BOTTOM);
+        btnHorarios.setHorizontalTextPosition(JButton.CENTER);
         btnHorarios.addActionListener(e -> {
             mostrarPanel(new HorarioVista());
         });
         JButton btnAsistencia = new JButton("Asistencia");
         asignarImagenBoton(btnAsistencia, "/proyectoescuela1/iconos/asistencia.png", 40, 40);
+        btnAsistencia.setVerticalTextPosition(JButton.BOTTOM);
+        btnAsistencia.setHorizontalTextPosition(JButton.CENTER);
         btnAsistencia.addActionListener(e -> {
-           mostrarPanel(new AsistenciaVista()); 
+            mostrarPanel(new AsistenciaVista());
         });
-        
         JButton btnNotas = new JButton("Notas");
         asignarImagenBoton(btnNotas, "/proyectoescuela1/iconos/notas.png", 40, 40);
+        btnNotas.setVerticalTextPosition(JButton.BOTTOM);
+        btnNotas.setHorizontalTextPosition(JButton.CENTER);
         btnNotas.addActionListener(e -> {
             mostrarPanel(new NotaVista());
         });
-        // En crearSubMenuAcademico()
-JButton btnAsignaciones =
-    new JButton("Asignación Cursos");
-btnAsignaciones.addActionListener(e -> {
-    mostrarPanel(new AsignacionCursoVista());
-});
-panel.add(btnAsignaciones);
+        // asignacion de cursos al docente
+        JButton btnAsignaciones = new JButton("Asignación Cursos");
+        asignarImagenBoton(btnAsignaciones, "/proyectoescuela1/iconos/asignacioncursos.png", 40, 40);
+        btnAsignaciones.setVerticalTextPosition(JButton.BOTTOM);
+        btnAsignaciones.setHorizontalTextPosition(JButton.CENTER);
+        btnAsignaciones.addActionListener(e -> {
+            mostrarPanel(new AsignacionCursoVista());
+        });
 
-        JButton btnLibretas = new JButton("Libretas de Notas");
-
+        panel.add(btnAsignaciones);
         panel.add(btnAlumnos);
         panel.add(btnApoderado);
         panel.add(btnDocentes);
@@ -276,58 +317,43 @@ panel.add(btnAsignaciones);
         panel.add(btnHorarios);
         panel.add(btnAsistencia);
         panel.add(btnNotas);
-        panel.add(btnLibretas);
-
-        // EVENTOS
-        btnAlumnos.addActionListener(e -> {
-            mostrarPanel(new AlumnoVista());
-        });
-        btnApoderado.addActionListener(e -> {
-            mostrarPanel(new ApoderadoVista());
-        });
-
-        btnDocentes.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Docentes"));
-        });
-
-        btnCursos.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Cursos"));
-        });
-
-        btnHorarios.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Horarios"));
-        });
-
-        btnAsistencia.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Asistencia"));
-        });
-
-        btnNotas.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Notas"));
-        });
-
-        btnLibretas.addActionListener(e -> {
-            mostrarPanel(crearPanelTemporal("Libretas de Notas"));
-        });
 
         return panel;
     }
 
-    //OJO TEMPORAL se borrara cuando teminemos todos las clases que falta
-    private JPanel crearPanelTemporal(String nombre) {
+    //Modulo de reportes
+    private JPanel crearSubMenuReportes() {
+        JPanel panel = new JPanel(new GridLayout(2, 4, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        JButton btnLibretas = new JButton("Libretas de Notas");
+        panel.add(btnLibretas);
 
-        JPanel p = new JPanel(new BorderLayout());
+        asignarImagenBoton(btnLibretas, "/proyectoescuela1/iconos/asignacioncursos.png", 40, 40);
+        btnLibretas.setVerticalTextPosition(JButton.BOTTOM);
+        btnLibretas.setHorizontalTextPosition(JButton.CENTER);
+        btnLibretas.addActionListener(e -> {
+            mostrarPanel(new LibretaNotasVista());
+        });
+        return panel;
 
-        JLabel lbl = new JLabel(
-                "Módulo: " + nombre + " (en desarrollo)",
-                SwingConstants.CENTER
-        );
+    }
 
-        lbl.setFont(new Font("Arial", Font.BOLD, 24));
+    // Modulo administrativo
+    private JPanel crearSubMenuAdministrativo() {
+        JPanel panel = new JPanel(new GridLayout(2, 4, 20, 20));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        p.add(lbl, BorderLayout.CENTER);
+        JButton btnPeriodo = new JButton("Período Académico");
+        asignarImagenBoton(btnPeriodo, "/proyectoescuela1/iconos/administrativo.png", 40, 40);
+        btnPeriodo.setVerticalTextPosition(JButton.BOTTOM);
+        btnPeriodo.setHorizontalTextPosition(JButton.CENTER);
+        btnPeriodo.addActionListener(e -> {
+            mostrarPanel(new PeriodoVista());
+        });
 
-        return p;
-    }//HASTA AQUI SE DEBE QUITAR AL FINAL
+        panel.add(btnPeriodo);
+
+        return panel;
+    }
 
 }

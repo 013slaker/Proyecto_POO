@@ -27,6 +27,10 @@ public class NotaControlador {
     private AlumnoControlador alumnoControlador =
             new AlumnoControlador();
 
+    /** Controlador de período académico: valida el bimestre activo */
+    private PeriodoControlador periodoControlador =
+            new PeriodoControlador();
+
     // ── CONSTRUCTOR ───────────────────────────────
     public NotaControlador() {
         cargarDatos();
@@ -41,6 +45,10 @@ public class NotaControlador {
      * correspondiente.
      */
     public void registrar(Nota nota) {
+        // No se permite registrar en un bimestre que no
+        // esté activo (cerrado, planificado o inexistente).
+        periodoControlador.validarBimestre(nota.getBimestre());
+
         notas.add(nota);
 
         // también la agrega al alumno directamente
@@ -67,6 +75,7 @@ public class NotaControlador {
      * Actualiza una nota existente.
      */
     public void actualizar(Nota nota) {
+        periodoControlador.validarBimestre(nota.getBimestre());
         for (int i = 0; i < notas.size(); i++) {
             if (notas.get(i).getIdNota()
                     .equals(nota.getIdNota())) {
@@ -158,6 +167,25 @@ public class NotaControlador {
         return notas.stream()
                 .filter(n -> n.getCodigoAlumno()
                         .equals(codigoAlumno))
+                .mapToDouble(Nota::getValor)
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
+     * Calcula el promedio de un alumno en un curso,
+     * dentro de un bimestre específico.
+     * Promedio simple: todos los componentes
+     * (Práctica 1, 2, 3, Participación, Examen)
+     * pesan igual. Nunca se ingresa a mano: siempre
+     * se calcula a partir de las notas registradas.
+     */
+    public double calcularPromedioCurso(
+            String codigoAlumno, String curso, int bimestre) {
+        return notas.stream()
+                .filter(n -> n.getCodigoAlumno().equals(codigoAlumno) &&
+                        n.getCurso().equalsIgnoreCase(curso) &&
+                        n.getBimestre() == bimestre)
                 .mapToDouble(Nota::getValor)
                 .average()
                 .orElse(0.0);

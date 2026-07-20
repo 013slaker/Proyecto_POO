@@ -50,8 +50,12 @@ public class NotaVista extends JPanel {
             new JComboBox<>(bimestres);
 
     private String[] tipos = {
-        "Parcial", "Examen", "Trabajo", "Promedio"
+        "Práctica 1", "Práctica 2", "Práctica 3",
+        "Participación", "Examen"
     };
+    // "Promedio" ya NO es un tipo seleccionable:
+    // el promedio se calcula solo (ver lblPromedio),
+    // nunca se ingresa a mano.
     private JComboBox<String> comboTipo =
             new JComboBox<>(tipos);
 
@@ -234,14 +238,24 @@ public class NotaVista extends JPanel {
                 alumnoSeleccionado.getCodigoAlumno()
             );
 
-            controlador.registrar(nota);
-            cargarNotasAlumno();
-            actualizarEstadisticas();
-            limpiarNota();
-            JOptionPane.showMessageDialog(this,
-                "Nota registrada: " + nota.getIdNota(),
-                "Éxito", JOptionPane.INFORMATION_MESSAGE
-            );
+            try {
+                controlador.registrar(nota);
+                cargarNotasAlumno();
+                actualizarEstadisticas();
+                limpiarNota();
+                JOptionPane.showMessageDialog(this,
+                    "Nota registrada: " + nota.getIdNota(),
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (IllegalStateException ex) {
+                // Se lanza cuando el bimestre no está activo
+                // (fuera de fecha, cerrado, o aún no configurado).
+                JOptionPane.showMessageDialog(this,
+                    ex.getMessage(),
+                    "Bimestre no disponible",
+                    JOptionPane.WARNING_MESSAGE
+                );
+            }
         });
 
         // ELIMINAR NOTA
