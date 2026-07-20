@@ -343,15 +343,46 @@ public class MenuPrincipalVista extends JFrame {
         JPanel panel = new JPanel(new GridLayout(2, 4, 20, 20));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JButton btnPeriodo = new JButton("Período Académico");
-        asignarImagenBoton(btnPeriodo, "/proyectoescuela1/iconos/administrativo.png", 40, 40);
+        // -- Periodo Academico (crear año, bimestres, activar/cerrar) --
+        JButton btnPeriodo = new JButton("Periodo Academico");
+        asignarImagenBoton(btnPeriodo, "/proyectoescuela1/iconos/periodo.png", 40, 40);
         btnPeriodo.setVerticalTextPosition(JButton.BOTTOM);
         btnPeriodo.setHorizontalTextPosition(JButton.CENTER);
         btnPeriodo.addActionListener(e -> {
             mostrarPanel(new PeriodoVista());
         });
 
+        // -- Matrículas (registrar, buscar, historial, reasignar) --
+        JButton btnMatriculas = new JButton("Matrículas");
+        asignarImagenBoton(btnMatriculas, "/proyectoescuela1/iconos/matricula.png", 40, 40);
+        btnMatriculas.setVerticalTextPosition(JButton.BOTTOM);
+        btnMatriculas.setHorizontalTextPosition(JButton.CENTER);
+        btnMatriculas.addActionListener(e -> {
+            mostrarPanel(new MatriculaVista());
+        });
+
+        // -- Cambio de Sección (trasladar alumnos entre secciones) --
+        JButton btnCambioSeccion = new JButton("Cambio de Sección");
+        asignarImagenBoton(btnCambioSeccion, "/proyectoescuela1/iconos/horario.png", 40, 40);
+        btnCambioSeccion.setVerticalTextPosition(JButton.BOTTOM);
+        btnCambioSeccion.setHorizontalTextPosition(JButton.CENTER);
+        btnCambioSeccion.addActionListener(e -> {
+            mostrarPanel(new CambioSeccionVista());
+        });
+
+        // -- Retiro de Alumno (cambiar estado, registrar motivo) --
+        JButton btnRetiro = new JButton("Retiro de Alumno");
+        asignarImagenBoton(btnRetiro, "/proyectoescuela1/iconos/alumno.png", 40, 40);
+        btnRetiro.setVerticalTextPosition(JButton.BOTTOM);
+        btnRetiro.setHorizontalTextPosition(JButton.CENTER);
+        btnRetiro.addActionListener(e -> {
+            mostrarPanel(new RetiroAlumnoVista());
+        });
+
         panel.add(btnPeriodo);
+        panel.add(btnMatriculas);
+        panel.add(btnCambioSeccion);
+        panel.add(btnRetiro);
 
         return panel;
     }

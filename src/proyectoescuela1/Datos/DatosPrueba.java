@@ -46,29 +46,30 @@ public class DatosPrueba {
      * no duplicar.
      */
     public void cargarTodo() {
-        System.out.println("=== CARGANDO DATOS "
-                + "DE PRUEBA ===");
+        System.out.println("=== CARGANDO DATOS DE PRUEBA ===");
 
-        // verifica si ya hay datos
         if (!alumnoCtrl.listarTodos().isEmpty()) {
             System.out.println(
-                    "Ya existen datos. "
-                    + "Omitiendo carga de prueba."
+                    "Ya existen datos. Omitiendo."
             );
             return;
         }
 
+        // ── PERÍODO PRIMERO — obligatorio ────────────
+        cargarPeriodoAcademico();
+
+        // ── LUEGO EL RESTO ───────────────────────────
         cargarDocentes();
         cargarCursos();
         cargarHorarios();
         cargarAlumnos();
         cargarApoderados();
-        cargarPeriodoAcademico();
+
+        // ── NOTAS Y ASISTENCIAS AL FINAL ─────────────
         cargarNotas();
         cargarAsistencias();
 
-        System.out.println("=== DATOS DE PRUEBA "
-                + "CARGADOS ===");
+        System.out.println("=== DATOS CARGADOS ===");
     }
 
     // ══════════════════════════════════════════════
@@ -332,12 +333,12 @@ public class DatosPrueba {
                 new Date()
         ));
         alumnoCtrl.registrarAlumno(new Alumno(
-                8,
+                9,
                 "Luna",
                 "Aldave Palomino",
-                "74890123",
+                "74901234",
                 "lunaaldave@gmail.com",
-                "987100008",
+                "987100009",
                 "Calle 23 Prado",
                 new Date(),
                 "Primaria",
@@ -382,7 +383,7 @@ public class DatosPrueba {
                 new Date(), "Madre", "Enfermera"
         );
         Apoderado apo6 = new Apoderado(
-                4, "Sofia", "Palomino Carrion",
+                6, "Sofia", "Palomino Carrion",
                 "100606762", "palomino@gmail.com",
                 "999201104", "Calle 23 Prado",
                 new Date(), "Madre", "Doctora"
@@ -427,6 +428,7 @@ public class DatosPrueba {
         apoderadoCtrl.registrar(apo2);
         apoderadoCtrl.registrar(apo3);
         apoderadoCtrl.registrar(apo4);
+        apoderadoCtrl.registrar(apo6);
 
         System.out.println("✓ "
                 + apoderadoCtrl.total()
@@ -476,6 +478,21 @@ public class DatosPrueba {
     // ══════════════════════════════════════════════
     private void cargarNotas() {
         System.out.println("Cargando notas...");
+        // muestra el bimestre activo
+        var bimestre = periodoCtrl.getBimestreActivo();
+        System.out.println("Bimestre activo: " + bimestre);
+
+        if (bimestre == null) {
+            System.out.println(
+                    "No hay bimestre activo. "
+                    + "Omitiendo notas."
+            );
+            return;
+        }
+
+        // activa explícitamente el bimestre 1
+        periodoCtrl.activarBimestre(1);
+        System.out.println("Bimestre 1 activado para notas.");
 
         List<Alumno> alumnos
                 = alumnoCtrl.listarTodos();

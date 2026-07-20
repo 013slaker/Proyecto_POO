@@ -12,7 +12,7 @@ import proyectoescuela1.Vista.*;
 public class ProyectoEscuela1 {
 
     public static void main(String[] args) {
-                // ── CARGA DATOS DE PRUEBA ─────────────────
+        // ── CARGA DATOS DE PRUEBA ─────────────────
         // Comenta esta línea cuando entregues
         new DatosPrueba().cargarTodo();
 
