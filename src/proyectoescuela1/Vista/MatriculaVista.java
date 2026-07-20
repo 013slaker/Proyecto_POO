@@ -20,20 +20,16 @@ import proyectoescuela1.Modelo.Matricula;
 /**
  * ====================================================================
  * MATRÍCULA
- * --------------------------------------------------------------------
- * - Nivel/Grado/Sección son combos en cascada (no texto libre), igual
- *   que en AlumnoVista, para evitar errores de tipeo.
- * - "Buscar" filtra la tabla de abajo por nombre o código de alumno
- *   (antes solo aceptaba el código exacto y parecía no hacer nada).
- * - "Ver historial del alumno" abre un diálogo aparte con TODAS las
- *   matrículas del alumno elegido en el combo de arriba, sin tapar la
- *   tabla principal.
- * - "Actualizar" ahora sí cambia algo: los combos de Nivel/Grado/
- *   Sección quedan habilitados y reflejan la fila seleccionada de la
- *   tabla, así que cambiarlos y presionar Actualizar reasigna de
- *   verdad al alumno de sección/grado (antes estaban bloqueados, por
- *   eso "actualizar" no modificaba nada).
- * - Se agregó el botón "Volver" para regresar al menú anterior.
+ * -------------------------------------------------------------------- -
+ * "Buscar" filtra la tabla de abajo por nombre o código de alumno (antes solo
+ * aceptaba el código exacto y parecía no hacer nada). - "Ver historial del
+ * alumno" abre un diálogo aparte con TODAS las matrículas del alumno elegido en
+ * el combo de arriba, sin tapar la tabla principal. - "Actualizar" ahora sí
+ * cambia algo: los combos de Nivel/Grado/ Sección quedan habilitados y reflejan
+ * la fila seleccionada de la tabla, así que cambiarlos y presionar Actualizar
+ * reasigna de verdad al alumno de sección/grado (antes estaban bloqueados, por
+ * eso "actualizar" no modificaba nada). - Se agregó el botón "Volver" para
+ * regresar al menú anterior.
  * ====================================================================
  */
 public class MatriculaVista extends JPanel {
@@ -48,7 +44,10 @@ public class MatriculaVista extends JPanel {
     //==========================================================
     // FORMULARIO
     //==========================================================
-    private JComboBox<Alumno> comboAlumno = new JComboBox<>();
+    private JTextField txtBuscarAlumno = new JTextField(15);
+    private JButton btnBuscarAlumno = new JButton("Buscar");
+    private JLabel lblAlumnoSeleccionado = new JLabel("(ningún alumno seleccionado)");
+    private Alumno alumnoSeleccionado = null;
     private JTextField txtAnio = new JTextField(8);
 
     private final String[] niveles = {"Primaria", "Secundaria"};
@@ -100,10 +99,13 @@ public class MatriculaVista extends JPanel {
     private String codigoSeleccionado = null;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-    /** Acción a ejecutar al presionar "Volver" (la asigna quien abre
-     *  esta pantalla, típicamente MenuPrincipalVista). Si no se
-     *  asigna, el botón simplemente no hace nada. */
-    private Runnable onVolver = () -> {};
+    /**
+     * Acción a ejecutar al presionar "Volver" (la asigna quien abre esta
+     * pantalla, típicamente MenuPrincipalVista). Si no se asigna, el botón
+     * simplemente no hace nada.
+     */
+    private Runnable onVolver = () -> {
+    };
 
     //==========================================================
     // CONSTRUCTORES
@@ -113,8 +115,8 @@ public class MatriculaVista extends JPanel {
     }
 
     /**
-     * @param onVolver acción para regresar al menú anterior (puede
-     *                 ser null si esta pantalla se usa sin ese botón)
+     * @param onVolver acción para regresar al menú anterior (puede ser null si
+     * esta pantalla se usa sin ese botón)
      */
     public MatriculaVista(Runnable onVolver) {
         if (onVolver != null) {
@@ -125,8 +127,6 @@ public class MatriculaVista extends JPanel {
 
         initComponentes();
         initEventos();
-
-        cargarAlumnos();
         cargarAnioActual();
         actualizarTabla();
     }
@@ -145,8 +145,13 @@ public class MatriculaVista extends JPanel {
         panelFormulario.setBorder(
                 BorderFactory.createTitledBorder("Datos de la Matrícula"));
 
+        JPanel panelBuscarAlumno = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBuscarAlumno.add(txtBuscarAlumno);
+        panelBuscarAlumno.add(btnBuscarAlumno);
+        panelBuscarAlumno.add(lblAlumnoSeleccionado);
+
         panelFormulario.add(new JLabel("Alumno:"));
-        panelFormulario.add(comboAlumno);
+        panelFormulario.add(panelBuscarAlumno);
 
         panelFormulario.add(new JLabel("Año Escolar:"));
         panelFormulario.add(txtAnio);
@@ -224,14 +229,33 @@ public class MatriculaVista extends JPanel {
         // ACTUALES como punto de partida (editable, por si se le va
         // a matricular en un grado distinto, p.ej. el año siguiente)
         //------------------------------------------------------
-        comboAlumno.addActionListener(e -> {
-            Alumno alumno = (Alumno) comboAlumno.getSelectedItem();
-            if (alumno != null) {
-                comboNivel.setSelectedItem(alumno.getNivel());
-                cargarGrados();
-                comboGrado.setSelectedItem(alumno.getGrado());
-                comboSeccion.setSelectedItem(alumno.getSeccion());
+        btnBuscarAlumno.addActionListener(e -> {
+            String texto = txtBuscarAlumno.getText().trim();
+            if (texto.isEmpty()) {
+                return;
             }
+
+            Alumno encontrado = alumnoCtrl.buscarPorCodigo(texto);
+            if (encontrado == null) {
+                List<Alumno> lista = alumnoCtrl.buscarPorNombre(texto);
+                if (!lista.isEmpty()) {
+                    encontrado = lista.get(0);
+                }
+            }
+            if (encontrado == null) {
+                JOptionPane.showMessageDialog(this, "Alumno no encontrado.",
+                        "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            alumnoSeleccionado = encontrado;
+            lblAlumnoSeleccionado.setText(encontrado.getNombreCompleto()
+                    + " (" + encontrado.getCodigoAlumno() + ")");
+
+            comboNivel.setSelectedItem(encontrado.getNivel());
+            cargarGrados();
+            comboGrado.setSelectedItem(encontrado.getGrado());
+            comboSeccion.setSelectedItem(encontrado.getSeccion());
         });
 
         // Al cambiar el nivel, se recargan los grados disponibles
@@ -243,7 +267,7 @@ public class MatriculaVista extends JPanel {
         btnMatricular.addActionListener(e -> {
 
             try {
-                Alumno alumno = (Alumno) comboAlumno.getSelectedItem();
+                Alumno alumno = alumnoSeleccionado;
 
                 if (alumno == null) {
                     JOptionPane.showMessageDialog(this, "Seleccione un alumno.");
@@ -337,7 +361,7 @@ public class MatriculaVista extends JPanel {
         // principal, para no generar confusión).
         //------------------------------------------------------
         btnHistorial.addActionListener(e -> {
-            Alumno alumno = (Alumno) comboAlumno.getSelectedItem();
+            Alumno alumno = alumnoSeleccionado;
 
             if (alumno == null) {
                 JOptionPane.showMessageDialog(this, "Seleccione un alumno.");
@@ -373,7 +397,9 @@ public class MatriculaVista extends JPanel {
                 return;
             }
 
-            comboAlumno.setSelectedItem(matricula.getAlumno());
+            alumnoSeleccionado = matricula.getAlumno();
+            lblAlumnoSeleccionado.setText(alumnoSeleccionado.getNombreCompleto()
+                    + " (" + alumnoSeleccionado.getCodigoAlumno() + ")");
             txtAnio.setText(String.valueOf(matricula.getAnio()));
             comboNivel.setSelectedItem(matricula.getNivel());
             cargarGrados();
@@ -474,19 +500,6 @@ public class MatriculaVista extends JPanel {
     }
 
     //==========================================================
-    // CARGAR ALUMNOS EN EL COMBO
-    //==========================================================
-    private void cargarAlumnos() {
-        comboAlumno.removeAllItems();
-        for (Alumno alumno : alumnoCtrl.listarTodos()) {
-            comboAlumno.addItem(alumno);
-        }
-        if (comboAlumno.getItemCount() > 0) {
-            comboAlumno.setSelectedIndex(0);
-        }
-    }
-
-    //==========================================================
     // CARGAR GRADOS SEGÚN EL NIVEL SELECCIONADO
     //==========================================================
     private void cargarGrados() {
@@ -546,9 +559,9 @@ public class MatriculaVista extends JPanel {
         codigoSeleccionado = null;
         txtBuscar.setText("");
         tabla.clearSelection();
-        if (comboAlumno.getItemCount() > 0) {
-            comboAlumno.setSelectedIndex(0);
-        }
+        alumnoSeleccionado = null;
+        txtBuscarAlumno.setText("");
+        lblAlumnoSeleccionado.setText("(ningún alumno seleccionado)");
         actualizarTabla();
     }
 }
