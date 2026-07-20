@@ -35,9 +35,6 @@ public class DatosPrueba {
             = new AsignacionCursoControlador();
     private NotaControlador notaCtrl
             = new NotaControlador();
-    // RegistroAsistenciaControlador es ahora la ÚNICA fuente de datos
-    // de asistencia (ver el nuevo AsistenciaControlador, que ya no
-    // guarda nada por su cuenta y solo consulta estos registros).
     private AsistenciaControlador regAsisCtrl
             = new AsistenciaControlador();
     private PeriodoControlador periodoCtrl
@@ -440,11 +437,10 @@ public class DatosPrueba {
     //  PERÍODO ACADÉMICO (Año Escolar y Bimestres)
     // ══════════════════════════════════════════════
     /**
-     * Crea el Año Escolar de prueba con las fechas típicas
-     * de los 4 bimestres. NotaControlador y AsistenciaControlador
-     * ya no aceptan registros si el bimestre correspondiente
-     * no está activo, así que este paso es obligatorio antes
-     * de cargar notas o asistencias.
+     * Crea el Año Escolar de prueba con las fechas típicas de los 4 bimestres.
+     * NotaControlador y AsistenciaControlador ya no aceptan registros si el
+     * bimestre correspondiente no está activo, así que este paso es obligatorio
+     * antes de cargar notas o asistencias.
      */
     private void cargarPeriodoAcademico() {
         System.out.println("Configurando período académico...");
@@ -497,11 +493,35 @@ public class DatosPrueba {
                     "Matemática", codigo
             ));
             notaCtrl.registrar(new Nota(
+                    1, 16.0, "Práctica 2",
+                    "Matemática", codigo
+            ));
+            notaCtrl.registrar(new Nota(
+                    1, 20, "Práctica 3",
+                    "Matemática", codigo
+            ));
+            notaCtrl.registrar(new Nota(
+                    1, 19, "Participación",
+                    "Matemática", codigo
+            ));
+            notaCtrl.registrar(new Nota(
                     1, 14.0, "Examen",
                     "Matemática", codigo
             ));
             notaCtrl.registrar(new Nota(
                     1, 16.0, "Práctica 1",
+                    "Comunicación", codigo
+            ));
+            notaCtrl.registrar(new Nota(
+                    1, 11.0, "Práctica 2",
+                    "Comunicación", codigo
+            ));
+            notaCtrl.registrar(new Nota(
+                    1, 12.0, "Práctica 3",
+                    "Comunicación", codigo
+            ));
+            notaCtrl.registrar(new Nota(
+                    1, 20.0, "Participación",
                     "Comunicación", codigo
             ));
             notaCtrl.registrar(new Nota(
@@ -539,8 +559,8 @@ public class DatosPrueba {
         boolean activado = periodoCtrl.activarBimestreQueContiene(new Date());
         if (!activado) {
             System.out.println(
-                "Aviso: la fecha de hoy no cae en ningún bimestre " +
-                "configurado; se omite la carga de asistencias de prueba."
+                    "Aviso: la fecha de hoy no cae en ningún bimestre "
+                    + "configurado; se omite la carga de asistencias de prueba."
             );
             return;
         }
