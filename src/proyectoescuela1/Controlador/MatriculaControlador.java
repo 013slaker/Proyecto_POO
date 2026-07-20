@@ -164,6 +164,17 @@ public class MatriculaControlador {
      */
     public void reasignarGradoSeccion(String codigoMatricula,
             String nuevoGrado, String nuevaSeccion) {
+        reasignarNivelGradoSeccion(codigoMatricula, null, nuevoGrado, nuevaSeccion);
+    }
+
+    /**
+     * Igual que reasignarGradoSeccion, pero además permite cambiar el
+     * nivel (Primaria/Secundaria). Si nuevoNivel es null, el nivel no
+     * se modifica (para no romper el código que ya llamaba a la
+     * versión de 3 parámetros).
+     */
+    public void reasignarNivelGradoSeccion(String codigoMatricula,
+            String nuevoNivel, String nuevoGrado, String nuevaSeccion) {
 
         Matricula matricula = buscarPorCodigo(codigoMatricula);
 
@@ -176,6 +187,11 @@ public class MatriculaControlador {
             throw new IllegalStateException(
                     "Solo se puede reasignar grado/sección a una "
                     + "matrícula en estado 'Matriculado'.");
+        }
+
+        if (nuevoNivel != null) {
+            matricula.setNivel(nuevoNivel);
+            matricula.getAlumno().setNivel(nuevoNivel);
         }
 
         matricula.setGrado(nuevoGrado);

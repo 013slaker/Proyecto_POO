@@ -17,7 +17,15 @@ import proyectoescuela1.Modelo.Alumno;
  * MÓDULO ADMINISTRATIVO -> CAMBIO DE SECCIÓN
  * ----------------------------------------------------------
  * Permite trasladar a uno o varios alumnos de una sección de
- * origen (grado + sección) hacia una sección de destino.
+ * origen (nivel + grado + sección) hacia una sección de
+ * destino.
+ *
+ * Nivel/Grado/Sección son combos en cascada (no texto libre)
+ * tanto para origen como para destino: así se evitan errores
+ * de tipeo (ej. escribir "3" en vez de "3°", que antes hacía
+ * que la búsqueda no encontrara a nadie sin avisar por qué) y
+ * se evita mezclar un "1°" de Primaria con un "1°" de
+ * Secundaria, que antes no se distinguían.
  * ==========================================================
  */
 public class CambioSeccionVista extends JPanel {
@@ -32,10 +40,19 @@ public class CambioSeccionVista extends JPanel {
             new CambioSeccionControlador(alumnoCtrl, matriculaCtrl, periodoCtrl);
 
     //==========================================================
+    // GRADOS POR NIVEL (igual que en AlumnoVista/MatriculaVista)
+    //==========================================================
+    private final String[] niveles = {"Primaria", "Secundaria"};
+    private final String[] gradosPrimaria = {"1°", "2°", "3°", "4°", "5°", "6°"};
+    private final String[] gradosSecundaria = {"1°", "2°", "3°", "4°", "5°"};
+    private final String[] secciones = {"A", "B", "C"};
+
+    //==========================================================
     // ORIGEN
     //==========================================================
-    private final JTextField txtGradoOrigen = new JTextField(8);
-    private final JTextField txtSeccionOrigen = new JTextField(8);
+    private final JComboBox<String> comboNivelOrigen = new JComboBox<>(niveles);
+    private final JComboBox<String> comboGradoOrigen = new JComboBox<>();
+    private final JComboBox<String> comboSeccionOrigen = new JComboBox<>(secciones);
     private final JButton btnBuscar = new JButton("Buscar Alumnos");
 
     //==========================================================
@@ -47,20 +64,45 @@ public class CambioSeccionVista extends JPanel {
     //==========================================================
     // DESTINO
     //==========================================================
-    private final JTextField txtGradoDestino = new JTextField(8);
-    private final JTextField txtSeccionDestino = new JTextField(8);
+    private final JComboBox<String> comboNivelDestino = new JComboBox<>(niveles);
+    private final JComboBox<String> comboGradoDestino = new JComboBox<>();
+    private final JComboBox<String> comboSeccionDestino = new JComboBox<>(secciones);
     private final JButton btnTrasladar = new JButton("Trasladar Seleccionados");
 
+    //==========================================================
+    // VOLVER
+    //==========================================================
+    private final JButton btnVolver = new JButton("Volver al menú");
+    private Runnable onVolver = () -> {};
+
     public CambioSeccionVista() {
+        this(null);
+    }
+
+    /** @param onVolver acción para regresar al menú anterior */
+    public CambioSeccionVista(Runnable onVolver) {
+        if (onVolver != null) {
+            this.onVolver = onVolver;
+        }
+
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        cargarGrados(comboNivelOrigen, comboGradoOrigen);
+        cargarGrados(comboNivelDestino, comboGradoDestino);
 
         add(crearPanelOrigen(), BorderLayout.NORTH);
         add(crearPanelLista(), BorderLayout.CENTER);
         add(crearPanelDestino(), BorderLayout.SOUTH);
 
+        comboNivelOrigen.addActionListener(e ->
+                cargarGrados(comboNivelOrigen, comboGradoOrigen));
+        comboNivelDestino.addActionListener(e ->
+                cargarGrados(comboNivelDestino, comboGradoDestino));
+
         btnBuscar.addActionListener(e -> buscarAlumnosDeOrigen());
         btnTrasladar.addActionListener(e -> trasladarSeleccionados());
+        btnVolver.addActionListener(e -> onVolver.run());
 
         listaAlumnos.setSelectionMode(
                 javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -68,12 +110,13 @@ public class CambioSeccionVista extends JPanel {
 
     private JPanel crearPanelOrigen() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.setBorder(BorderFactory.createTitledBorder(
-                "Sección de Origen"));
+        panel.setBorder(BorderFactory.createTitledBorder("Sección de Origen"));
+        panel.add(new JLabel("Nivel:"));
+        panel.add(comboNivelOrigen);
         panel.add(new JLabel("Grado:"));
-        panel.add(txtGradoOrigen);
+        panel.add(comboGradoOrigen);
         panel.add(new JLabel("Sección:"));
-        panel.add(txtSeccionOrigen);
+        panel.add(comboSeccionOrigen);
         panel.add(btnBuscar);
         return panel;
     }
@@ -102,15 +145,17 @@ public class CambioSeccionVista extends JPanel {
         JPanel panel = new JPanel(new GridLayout(2, 1));
 
         JPanel campos = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        campos.setBorder(BorderFactory.createTitledBorder(
-                "Sección de Destino"));
+        campos.setBorder(BorderFactory.createTitledBorder("Sección de Destino"));
+        campos.add(new JLabel("Nuevo Nivel:"));
+        campos.add(comboNivelDestino);
         campos.add(new JLabel("Nuevo Grado:"));
-        campos.add(txtGradoDestino);
+        campos.add(comboGradoDestino);
         campos.add(new JLabel("Nueva Sección:"));
-        campos.add(txtSeccionDestino);
+        campos.add(comboSeccionDestino);
 
         JPanel botones = new JPanel(new FlowLayout());
         botones.add(btnTrasladar);
+        botones.add(btnVolver);
 
         panel.add(campos);
         panel.add(botones);
@@ -118,25 +163,44 @@ public class CambioSeccionVista extends JPanel {
     }
 
     //==========================================================
+    // CARGA LOS GRADOS DE UN COMBO SEGÚN EL NIVEL ELEGIDO
+    //==========================================================
+    private void cargarGrados(JComboBox<String> comboNivel,
+            JComboBox<String> comboGrado) {
+
+        comboGrado.removeAllItems();
+        comboGrado.addItem("Seleccione un grado");
+
+        String[] grados = "Primaria".equals(comboNivel.getSelectedItem())
+                ? gradosPrimaria : gradosSecundaria;
+
+        for (String grado : grados) {
+            comboGrado.addItem(grado);
+        }
+    }
+
+    //==========================================================
     // ACCIONES
     //==========================================================
     private void buscarAlumnosDeOrigen() {
-        String grado = txtGradoOrigen.getText().trim();
-        String seccion = txtSeccionOrigen.getText().trim();
 
-        if (grado.isEmpty() || seccion.isEmpty()) {
+        if (comboGradoOrigen.getSelectedIndex() <= 0) {
             JOptionPane.showMessageDialog(this,
-                    "Ingresa el grado y la sección de origen.");
+                    "Seleccione el grado de origen.");
             return;
         }
 
+        String nivel = (String) comboNivelOrigen.getSelectedItem();
+        String grado = (String) comboGradoOrigen.getSelectedItem();
+        String seccion = (String) comboSeccionOrigen.getSelectedItem();
+
         modeloLista.clear();
-        List<Alumno> alumnos = cambioCtrl.listarAlumnosDeSeccion(grado, seccion);
+        List<Alumno> alumnos = cambioCtrl.listarAlumnosDeSeccion(nivel, grado, seccion);
 
         if (alumnos.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                     "No se encontraron alumnos activos en "
-                    + grado + " \"" + seccion + "\".");
+                    + nivel + " " + grado + " \"" + seccion + "\".");
             return;
         }
 
@@ -154,18 +218,19 @@ public class CambioSeccionVista extends JPanel {
             return;
         }
 
-        String gradoDestino = txtGradoDestino.getText().trim();
-        String seccionDestino = txtSeccionDestino.getText().trim();
-
-        if (gradoDestino.isEmpty() || seccionDestino.isEmpty()) {
+        if (comboGradoDestino.getSelectedIndex() <= 0) {
             JOptionPane.showMessageDialog(this,
-                    "Ingresa el grado y la sección de destino.");
+                    "Seleccione el grado de destino.");
             return;
         }
 
+        String nivelDestino = (String) comboNivelDestino.getSelectedItem();
+        String gradoDestino = (String) comboGradoDestino.getSelectedItem();
+        String seccionDestino = (String) comboSeccionDestino.getSelectedItem();
+
         int opcion = JOptionPane.showConfirmDialog(this,
                 "¿Trasladar " + seleccionados.size() + " alumno(s) a "
-                + gradoDestino + " \"" + seccionDestino + "\"?",
+                + nivelDestino + " " + gradoDestino + " \"" + seccionDestino + "\"?",
                 "Confirmar traslado", JOptionPane.YES_NO_OPTION);
 
         if (opcion != JOptionPane.YES_OPTION) {
@@ -173,7 +238,7 @@ public class CambioSeccionVista extends JPanel {
         }
 
         int exitosos = cambioCtrl.trasladarAlumnos(
-                seleccionados, gradoDestino, seccionDestino);
+                seleccionados, nivelDestino, gradoDestino, seccionDestino);
 
         JOptionPane.showMessageDialog(this,
                 exitosos + " de " + seleccionados.size()

@@ -358,7 +358,8 @@ public class MenuPrincipalVista extends JFrame {
         btnMatriculas.setVerticalTextPosition(JButton.BOTTOM);
         btnMatriculas.setHorizontalTextPosition(JButton.CENTER);
         btnMatriculas.addActionListener(e -> {
-            mostrarPanel(new MatriculaVista());
+            mostrarPanel(new MatriculaVista(
+                    () -> mostrarPanel(crearSubMenuAdministrativo())));
         });
 
         // -- Cambio de Sección (trasladar alumnos entre secciones) --
@@ -367,7 +368,8 @@ public class MenuPrincipalVista extends JFrame {
         btnCambioSeccion.setVerticalTextPosition(JButton.BOTTOM);
         btnCambioSeccion.setHorizontalTextPosition(JButton.CENTER);
         btnCambioSeccion.addActionListener(e -> {
-            mostrarPanel(new CambioSeccionVista());
+            mostrarPanel(new CambioSeccionVista(
+                    () -> mostrarPanel(crearSubMenuAdministrativo())));
         });
 
         // -- Retiro de Alumno (cambiar estado, registrar motivo) --

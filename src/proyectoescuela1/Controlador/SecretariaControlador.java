@@ -10,9 +10,9 @@ public class SecretariaControlador {
         this.secretaria = secretaria;
     }
 
-    public void registrarMatricula(String alumno, String grado, String seccion) {
-        secretaria.registrarMatricula(alumno, grado, seccion);
-    }
+    // El registro de matrícula real vive en MatriculaControlador /
+    // MatriculaVista. Este wrapper llamaba a un método de Secretaria
+    // que ya no existe (usaba un constructor de Matricula obsoleto).
 
     public void emitirDocumento(String alumno) {
         secretaria.emitirDocumento(alumno);

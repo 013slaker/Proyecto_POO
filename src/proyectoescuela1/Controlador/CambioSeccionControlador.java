@@ -31,31 +31,40 @@ public class CambioSeccionControlador {
     }
 
     /**
-     * Lista los alumnos activos que actualmente están en el
+     * Lista los alumnos activos que actualmente están en el nivel,
      * grado y sección indicados (los candidatos a trasladar).
+     *
+     * Se filtra también por NIVEL porque el mismo texto de grado
+     * (ej. "1°") existe tanto en Primaria como en Secundaria; sin el
+     * nivel se mezclarían alumnos de niveles distintos.
      */
-    public List<Alumno> listarAlumnosDeSeccion(String grado, String seccion) {
+    public List<Alumno> listarAlumnosDeSeccion(String nivel, String grado,
+            String seccion) {
         return alumnoCtrl.buscarPorGradoSeccion(grado, seccion)
                 .stream()
                 .filter(Alumno::isEstadoActivo)
+                .filter(a -> a.getNivel().equalsIgnoreCase(nivel))
                 .toList();
     }
 
     /**
-     * Traslada un único alumno hacia el nuevo grado/sección.
-     * Actualiza el registro del Alumno y, si existe, la
-     * matrícula vigente del año escolar activo.
+     * Traslada un único alumno hacia el nuevo nivel/grado/sección.
+     * Actualiza el registro del Alumno y, si existe, la matrícula
+     * vigente del año escolar activo. Permite cambiar el nivel para
+     * cubrir la promoción de 6° de Primaria a 1° de Secundaria.
      */
-    public void trasladarAlumno(Alumno alumno, String nuevoGrado,
-            String nuevaSeccion) {
+    public void trasladarAlumno(Alumno alumno, String nuevoNivel,
+            String nuevoGrado, String nuevaSeccion) {
 
-        if (nuevoGrado == null || nuevoGrado.isBlank()
+        if (nuevoNivel == null || nuevoNivel.isBlank()
+                || nuevoGrado == null || nuevoGrado.isBlank()
                 || nuevaSeccion == null || nuevaSeccion.isBlank()) {
             throw new IllegalArgumentException(
-                    "Debe indicar el grado y la sección de destino.");
+                    "Debe indicar el nivel, grado y sección de destino.");
         }
 
         // 1) Actualiza al alumno
+        alumno.setNivel(nuevoNivel);
         alumno.setGrado(nuevoGrado);
         alumno.setSeccion(nuevaSeccion);
         alumnoCtrl.actualizarAlumno(alumno);
@@ -66,24 +75,25 @@ public class CambioSeccionControlador {
             Matricula vigente = matriculaCtrl.buscarMatriculaVigente(
                     alumno.getCodigoAlumno(), anio);
             if (vigente != null) {
-                matriculaCtrl.reasignarGradoSeccion(
-                        vigente.getCodigoMatricula(), nuevoGrado, nuevaSeccion);
+                matriculaCtrl.reasignarNivelGradoSeccion(
+                        vigente.getCodigoMatricula(), nuevoNivel,
+                        nuevoGrado, nuevaSeccion);
             }
         }
     }
 
     /**
      * Traslada una lista completa de alumnos hacia el mismo
-     * grado/sección de destino. Devuelve cuántos se trasladaron
+     * nivel/grado/sección de destino. Devuelve cuántos se trasladaron
      * correctamente (permite continuar aunque alguno falle).
      */
-    public int trasladarAlumnos(List<Alumno> alumnos, String nuevoGrado,
-            String nuevaSeccion) {
+    public int trasladarAlumnos(List<Alumno> alumnos, String nuevoNivel,
+            String nuevoGrado, String nuevaSeccion) {
 
         int exitosos = 0;
         for (Alumno alumno : alumnos) {
             try {
-                trasladarAlumno(alumno, nuevoGrado, nuevaSeccion);
+                trasladarAlumno(alumno, nuevoNivel, nuevoGrado, nuevaSeccion);
                 exitosos++;
             } catch (Exception e) {
                 System.out.println("No se pudo trasladar a "

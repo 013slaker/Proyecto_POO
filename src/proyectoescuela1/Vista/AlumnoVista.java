@@ -41,6 +41,31 @@ public class AlumnoVista extends JPanel {
         "1°", "2°", "3°", "4°", "5°"
     };
 
+    // ── NUEVOS CAMPOS PERSONALES ───────────────────
+    private String[] sexos = {"Masculino", "Femenino"};
+    private JComboBox<String> comboSexo = new JComboBox<>(sexos);
+
+    // Los 24 departamentos del Perú + la Provincia Constitucional
+    // del Callao, en combo para evitar errores de tipeo. Provincia
+    // y distrito quedan en texto libre porque son cientos y no es
+    // práctico tenerlos todos precargados.
+    private String[] departamentos = {
+        "Amazonas", "Áncash", "Apurímac", "Arequipa", "Ayacucho",
+        "Cajamarca", "Callao", "Cusco", "Huancavelica", "Huánuco",
+        "Ica", "Junín", "La Libertad", "Lambayeque", "Lima",
+        "Loreto", "Madre de Dios", "Moquegua", "Pasco", "Piura",
+        "Puno", "San Martín", "Tacna", "Tumbes", "Ucayali"
+    };
+    private JComboBox<String> comboDepartamentoNac = new JComboBox<>(departamentos);
+    private JTextField txtProvinciaNac = new JTextField(12);
+    private JTextField txtDistritoNac = new JTextField(12);
+
+    private String[] seguros = {"Ninguno", "SIS", "EsSalud", "Particular"};
+    private JComboBox<String> comboSeguro = new JComboBox<>(seguros);
+
+    private JCheckBox checkDiscapacidad = new JCheckBox("Presenta discapacidad");
+    private JTextField txtTipoDiscapacidad = new JTextField(15);
+
     // ── BOTONES ───────────────────────────────────
     private JButton btnGuardar = new JButton("Guardar");
     private JButton btnEliminar = new JButton("Eliminar");
@@ -105,6 +130,22 @@ public class AlumnoVista extends JPanel {
         panelForm.add(comboGrado);
         panelForm.add(new JLabel("Sección:"));
         panelForm.add(comboSeccion);
+        panelForm.add(new JLabel("Sexo:"));
+        panelForm.add(comboSexo);
+        panelForm.add(new JLabel("Departamento de nacimiento:"));
+        panelForm.add(comboDepartamentoNac);
+        panelForm.add(new JLabel("Provincia de nacimiento:"));
+        panelForm.add(txtProvinciaNac);
+        panelForm.add(new JLabel("Distrito de nacimiento:"));
+        panelForm.add(txtDistritoNac);
+        panelForm.add(new JLabel("Seguro de salud:"));
+        panelForm.add(comboSeguro);
+        panelForm.add(checkDiscapacidad);
+        panelForm.add(txtTipoDiscapacidad);
+
+        // el detalle de discapacidad solo se activa si el check está marcado
+        txtTipoDiscapacidad.setEnabled(false);
+        txtTipoDiscapacidad.setToolTipText("Detalle de la discapacidad");
 
         // BOTONES
         JPanel panelBotones = new JPanel(new FlowLayout());
@@ -145,6 +186,14 @@ public class AlumnoVista extends JPanel {
     private void initEventos() {
         comboNivel.addActionListener(e -> cargarGrados());
 
+        // habilita el detalle solo si se marca "presenta discapacidad"
+        checkDiscapacidad.addActionListener(e -> {
+            txtTipoDiscapacidad.setEnabled(checkDiscapacidad.isSelected());
+            if (!checkDiscapacidad.isSelected()) {
+                txtTipoDiscapacidad.setText("");
+            }
+        });
+
         // GUARDAR — registra nuevo alumno
         btnGuardar.addActionListener(e -> {
 
@@ -180,6 +229,9 @@ public class AlumnoVista extends JPanel {
             );
 
             controlador.registrarAlumno(alumno);
+
+            aplicarDatosPersonalesAdicionales(alumno);
+            controlador.actualizarAlumno(alumno);
 
             actualizarTabla(controlador.listarTodos());
 
@@ -239,6 +291,7 @@ public class AlumnoVista extends JPanel {
             original.setSeccion(
                     (String) comboSeccion.getSelectedItem()
             );
+            aplicarDatosPersonalesAdicionales(original);
 
             controlador.actualizarAlumno(original);
             actualizarTabla(controlador.listarTodos());
@@ -290,9 +343,34 @@ public class AlumnoVista extends JPanel {
                     comboNivel.setSelectedItem(a.getNivel());
                     comboGrado.setSelectedItem(a.getGrado());
                     comboSeccion.setSelectedItem(a.getSeccion());
+                    comboSexo.setSelectedItem(a.getSexo());
+                    comboDepartamentoNac.setSelectedItem(
+                            a.getDepartamentoNacimiento());
+                    txtProvinciaNac.setText(a.getProvinciaNacimiento());
+                    txtDistritoNac.setText(a.getDistritoNacimiento());
+                    comboSeguro.setSelectedItem(a.getTipoSeguro());
+                    checkDiscapacidad.setSelected(a.isPresentaDiscapacidad());
+                    txtTipoDiscapacidad.setEnabled(a.isPresentaDiscapacidad());
+                    txtTipoDiscapacidad.setText(a.getTipoDiscapacidad());
                 }
             }
         });
+    }
+
+    /**
+     * Copia al Alumno los datos personales adicionales del formulario
+     * (sexo, lugar de nacimiento, seguro, discapacidad). Se hace en un
+     * solo lugar para no repetir el mismo bloque en Guardar y Actualizar.
+     */
+    private void aplicarDatosPersonalesAdicionales(Alumno alumno) {
+        alumno.setSexo((String) comboSexo.getSelectedItem());
+        alumno.setDepartamentoNacimiento(
+                (String) comboDepartamentoNac.getSelectedItem());
+        alumno.setProvinciaNacimiento(txtProvinciaNac.getText().trim());
+        alumno.setDistritoNacimiento(txtDistritoNac.getText().trim());
+        alumno.setTipoSeguro((String) comboSeguro.getSelectedItem());
+        alumno.setPresentaDiscapacidad(checkDiscapacidad.isSelected());
+        alumno.setTipoDiscapacidad(txtTipoDiscapacidad.getText().trim());
     }
 
     // ── VALIDACIÓN DE CAMPOS ──────────────────────
@@ -356,6 +434,14 @@ public class AlumnoVista extends JPanel {
         comboNivel.setSelectedIndex(0);
         comboGrado.setSelectedIndex(0);
         comboSeccion.setSelectedIndex(0);
+        comboSexo.setSelectedIndex(0);
+        comboDepartamentoNac.setSelectedIndex(0);
+        txtProvinciaNac.setText("");
+        txtDistritoNac.setText("");
+        comboSeguro.setSelectedIndex(0);
+        checkDiscapacidad.setSelected(false);
+        txtTipoDiscapacidad.setEnabled(false);
+        txtTipoDiscapacidad.setText("");
         codigoSeleccionado = null;
         tabla.clearSelection();
     }

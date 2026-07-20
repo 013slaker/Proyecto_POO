@@ -101,6 +101,10 @@ public class Matricula implements Serializable {
         this.grado = grado;
     }
 
+    public void setNivel(String nivel) {
+        this.nivel = nivel;
+    }
+
     public void setSeccion(String seccion) {
         this.seccion = seccion;
     }

@@ -19,6 +19,7 @@ public abstract class Usuario implements Serializable {
     protected String telefono;
     protected String direccion;
     protected Date fechaNac;
+     protected String sexo = "No especificado";
 
 
     protected Usuario() {
@@ -115,6 +116,14 @@ public abstract class Usuario implements Serializable {
 
     public void setFechaNac(Date fechaNac) {
         this.fechaNac = fechaNac;
+    }
+
+    public String getSexo() {
+        return sexo;
+    }
+
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
     }
   
     

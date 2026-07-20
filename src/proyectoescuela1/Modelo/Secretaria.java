@@ -21,16 +21,6 @@ public class Secretaria extends Usuario{
     
     
 
-    public void registrarMatricula(String alumno, String grado, String seccion) {
-
-        Matricula m = new Matricula(alumno, grado, seccion);
-
-        JOptionPane.showMessageDialog(null,
-                "Alumno: " + m.getAlumno()
-                + "\nGrado: " + m.getGrado()
-                + "\nSección: " + m.getSeccion()
-                + "\n\nMatrícula registrada correctamente");
-    }
 
     public void emitirDocumento(String alumno) {
 
