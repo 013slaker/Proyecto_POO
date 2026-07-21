@@ -37,21 +37,33 @@ public class LoginVista extends JFrame {
     }
 
     //para añadir imagen y darle formato
-    private JLabel crearLogo() {
-
-        ImageIcon icono = new ImageIcon(
-                getClass().getResource("/proyectoescuela1/iconos/insignia.png"));
-
-        Image imagen = icono.getImage().getScaledInstance(
-                220,
-                120,
-                Image.SCALE_SMOOTH);
-
-        JLabel lblLogo = new JLabel(new ImageIcon(imagen));
-        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-
-        return lblLogo;
+  private JLabel crearLogo() {
+    
+    // Ruta absoluta desde src/ (con / al inicio)
+    java.net.URL url = getClass().getResource("/proyectoescuela1/iconos/insignia.png");
+    
+    // Si no la encuentra, prueba relativa al paquete (sin /)
+    if (url == null) {
+        url = getClass().getResource("iconos/insignia.png");
     }
+    
+    JLabel lblLogo = new JLabel();
+    lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+    
+    if (url != null) {
+        ImageIcon icono = new ImageIcon(url);
+        Image imagen = icono.getImage().getScaledInstance(220, 120, Image.SCALE_SMOOTH);
+        lblLogo.setIcon(new ImageIcon(imagen));
+    } else {
+        // Fallback: texto o imagen por defecto
+        lblLogo.setText(" ESCUELA");
+        lblLogo.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
+        lblLogo.setForeground(java.awt.Color.DARK_GRAY);
+        System.err.println("ADVERTENCIA: No se encontró insignia.png. Verifica la ruta.");
+    }
+    
+    return lblLogo;
+}
 
     // -----------------------------
     // INTERFAZ GRÁFICA
